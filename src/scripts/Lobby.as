@@ -705,40 +705,53 @@ public function receivePrivateMessage(event:CustomEvent):void
 {
 	debugMsg("receivePrivateMessage->  fromUserName: "+event.eventObj.fromUserName+"  toUserName: "+event.eventObj.toUserName+"  msg: "+event.eventObj.msg);
 	
-	if (openPopUps_AC.length)
+	if (isUserIgnored(userListPanel.getUserObj(event.eventObj.fromUserID).acctID, event.eventObj.fromUserName)) return;
+	
+	if (__appWideSingleton.appInfoObj.isPrivateMessageEnabledChecked==false)
 	{
-		for (var i:Object in openPopUps_AC)
-		{
-			trace("OPEN PM>  openPopUps_AC[i].id: "+openPopUps_AC[i].id+"  userID: "+event.eventObj.userID+"  fromUserID: "+event.eventObj.fromUserID+"  toUserID: "+event.eventObj.toUserID);
-			if (openPopUps_AC[i].id == "pm_"+event.eventObj.userID)
-			{
-				trace("PM WINDOW ALREADY EXISTS!>>  openPopUps_AC[i].id: "+openPopUps_AC[i].id);
-				//userListPanel.userCmdObj = event.eventObj;
-				openPopUps_AC[i].receivePrivateMessage(event.cloneCustomEvent().eventObj);
-				break;
-			} else {
-				// the PM window does not exist
-				trace("EXISTING CURRENT POPUPS, BUT THIS PM WINDOW DOES NOT EXIST!>>    openPopUps_AC[i].id: "+openPopUps_AC[i].id);
-				PopUpManager.createPopUp(parentApplication.lobby, PrivateMessage_PopUpTitleWindow, false);
-				openPopUps_AC[openPopUps_AC.length - 1].receivePrivateMessage(event.eventObj);
-				break;
-			}
-		}
-		i = null;
+		// TODO let the fromUser know pm's are disabled
+		return;
+	}
+	
+	if (__appWideSingleton.appInfoObj.isPrivateMessageInNewWindowChecked==false)
+	{
+		// TODO show pm in chat
 	} else {
-		// no current popUps
-		trace("NO CURRENT POPUPS, AND THE PM WINDOW DOES NOT EXIST!");
-		//userListPanel.userCmdObj = event.eventObj;
-		PopUpManager.createPopUp(parentApplication.lobby, PrivateMessage_PopUpTitleWindow, false);
-		//for (var y:Object in openPopUps_AC)
-		//{
-		//if (openPopUps_AC[y].cmdObj.toUserID == event.eventObj.toUserID)
-		//{
-		trace("PM WINDOW NOW EXISTS!");
-		openPopUps_AC[openPopUps_AC.length - 1].receivePrivateMessage(event.cloneCustomEvent().eventObj);
-		//}
-		//}
-		//y = null;
+		if (openPopUps_AC.length)
+		{
+			for (var i:Object in openPopUps_AC)
+			{
+				trace("OPEN PM>  openPopUps_AC[i].id: "+openPopUps_AC[i].id+"  userID: "+event.eventObj.userID+"  fromUserID: "+event.eventObj.fromUserID+"  toUserID: "+event.eventObj.toUserID);
+				if (openPopUps_AC[i].id == "pm_"+event.eventObj.userID)
+				{
+					trace("PM WINDOW ALREADY EXISTS!>>  openPopUps_AC[i].id: "+openPopUps_AC[i].id);
+					//userListPanel.userCmdObj = event.eventObj;
+					openPopUps_AC[i].receivePrivateMessage(event.cloneCustomEvent().eventObj);
+					break;
+				} else {
+					// the PM window does not exist
+					trace("EXISTING CURRENT POPUPS, BUT THIS PM WINDOW DOES NOT EXIST!>>    openPopUps_AC[i].id: "+openPopUps_AC[i].id);
+					PopUpManager.createPopUp(parentApplication.lobby, PrivateMessage_PopUpTitleWindow, false);
+					openPopUps_AC[openPopUps_AC.length - 1].receivePrivateMessage(event.eventObj);
+					break;
+				}
+			}
+			i = null;
+		} else {
+			// no current popUps
+			trace("NO CURRENT POPUPS, AND THE PM WINDOW DOES NOT EXIST!");
+			//userListPanel.userCmdObj = event.eventObj;
+			PopUpManager.createPopUp(parentApplication.lobby, PrivateMessage_PopUpTitleWindow, false);
+			//for (var y:Object in openPopUps_AC)
+			//{
+			//if (openPopUps_AC[y].cmdObj.toUserID == event.eventObj.toUserID)
+			//{
+			trace("PM WINDOW NOW EXISTS!");
+			openPopUps_AC[openPopUps_AC.length - 1].receivePrivateMessage(event.cloneCustomEvent().eventObj);
+			//}
+			//}
+			//y = null;
+		}
 	}
 	
 	event = null;

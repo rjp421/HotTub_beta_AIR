@@ -32,13 +32,14 @@ package me.whohacked.app
 		private var __appWideEventDispatcher:AppWideEventDispatcher_Singleton;
 		
 		
-		// version 4, date 03-19-2018, build 01
-		public var version:Number = 40319201801;
+		// version 4, date 04-16-2019, build 04
+		public var version:Number = 40416201904;
 		public var debugMode:Boolean = true;
 		
 		public var flashVars:Object;
 		public var statsTimer:Timer;
 		
+		public var loggedOut:Boolean = true; // used for auto-reconnect
 		public var localNetConnection:NetConnectionManager;
 		public var localCamera:Camera;
 		public var localMic:Microphone;
@@ -138,7 +139,7 @@ package me.whohacked.app
 			appInfoObj.selectedConnectionProtocol = "rtmp";
 			appInfoObj.selectedLayout = "medium";
 			appInfoObj.selectedCameraName = "";
-			appInfoObj.selectedCameraInputSize = "160x120";
+			appInfoObj.selectedCameraInputSize = "320x240";
 			appInfoObj.selectedMicrophoneName = "Default";
 			appInfoObj.selectedVideoCodec = "sorenson"; // sorenson, or h264
 			appInfoObj.selectedAudioCodec = "nellymoser"; // nellymoser (default) or speex
@@ -156,6 +157,7 @@ package me.whohacked.app
 			appInfoObj.isRoomHostOnMainChecked = true; // true
 			appInfoObj.isUnmuteRoomHostChecked = true; // false
 			appInfoObj.isShowTimestampsChecked = true; // false
+			appInfoObj.isPrivateMessageEnabledChecked = true;
 			appInfoObj.isPrivateMessageInNewWindowChecked = true;
 			appInfoObj.isBanned = false;
 			appInfoObj.fontBold = false;

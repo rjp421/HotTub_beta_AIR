@@ -341,7 +341,7 @@
 									   label="AVC H.264" value="H264" 
 									   layoutDirection="rtl" height="100%" 
 									   fontSize="11" 
-									   toolTip="Use the new H.264 video codec to stream video to the server, EXPERIMENTAL!"/>
+									   toolTip="Use the newer H.264 video codec to stream video to the server, EXPERIMENTAL!"/>
 					</s:HGroup>
 				</s:VGroup>
 				
@@ -366,7 +366,7 @@
 									   label="Speex" value="Speex" 
 									   layoutDirection="rtl" height="100%" 
 									   fontSize="11" 
-									   toolTip="Use the new Speex audio codec to stream audio to the server, EXPERIMENTAL!"/>
+									   toolTip="Use the newer Speex audio codec to stream audio to the server, EXPERIMENTAL!"/>
 					</s:HGroup>
 				</s:VGroup>
 				
@@ -447,7 +447,7 @@
 				 link="registerURL_linkHandler(event)">
 			<mx:htmlText>
 				<![CDATA[
-					<a href='event:https://www.gigglecams.com/register' target='_blank'>CREATE/EDIT YOUR ACCOUNT @ https://www.gigglecams.com/register</a>
+					<a href='event:https://whohacked.me/register' target='_blank'>CREATE/EDIT YOUR ACCOUNT @ https://whohacked.me/register</a>
 				]]>
 			</mx:htmlText>
 		</mx:Text>

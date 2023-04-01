@@ -101,6 +101,9 @@
 				unmuteRoomHost_CB.selected = __appWideSingleton.appInfoObj['isUnmuteRoomHostChecked'];
 				showTimestamps_CB.selected = __appWideSingleton.appInfoObj['isShowTimestampsChecked'];
 				
+				privateMessageEnabled_CB.selected = __appWideSingleton.appInfoObj['isPrivateMessageEnabledChecked'];
+				privateMessageInNewWindow_CB.selected = __appWideSingleton.appInfoObj['isPrivateMessageInNewWindowChecked'];
+				
 				if (this['selectedCameraInputSize_'+__appWideSingleton.appInfoObj["selectedCameraInputSize"]+'_RB'])
 				{
 					this['selectedCameraInputSize_'+__appWideSingleton.appInfoObj["selectedCameraInputSize"]+'_RB'].selected = true;
@@ -197,6 +200,14 @@
 			}
 			
 			
+			private function privateMessageEnabled_CB_valueCommitHandler(event:FlexEvent):void
+			{
+				__appWideSingleton.setAppInfo("isPrivateMessageEnabledChecked", privateMessageEnabled_CB.selected);
+				
+				event = null;
+			}
+			
+			
 			private function privateMessageInNewWindow_CB_valueCommitHandler(event:FlexEvent):void
 			{
 				__appWideSingleton.setAppInfo("isPrivateMessageInNewWindowChecked", privateMessageInNewWindow_CB.selected);
@@ -254,13 +265,11 @@
 			}
 			
 			
+			// TODO port to AIR functionality
 			private function openFlashSettingsBtn_clickHandler(event:MouseEvent):void
 			{
 				var device:String = event.target.id.split('choose')[1].split('_')[0];
-				var alert:Alert = Alert.show('If the settings did not popup, right click the application and goto Settings.' + '\n\n' +
-												'Goto the Camera and Microphone tabs to choose.' + '\n\n' +
-												'Click OK when you\'re finished.', 
-												'', Alert.OK, this, alertCloseHandler, 
+				var alert:Alert = Alert.show('TODO.', '', Alert.OK, this, alertCloseHandler, 
 												__iconManager.getIcon('app_info'));
 				
 				__appWideEventDispatcher.dispatchEvent(new CustomEvent('openFlashSettings', false,false, {device:device}));
@@ -478,8 +487,12 @@
 				
 				<s:Spacer height="20"/>
 				
+				<s:CheckBox id="privateMessageEnabled_CB"
+							label="Enable PM's" 
+							valueCommit="privateMessageEnabled_CB_valueCommitHandler(event)"/>
+				
 				<s:CheckBox id="privateMessageInNewWindow_CB"
-							label="Show PM's in a new window" 
+							label="Show PM's in a new window" enabled="false"
 							valueCommit="privateMessageInNewWindow_CB_valueCommitHandler(event)"/>
 				
 			</s:VGroup>
@@ -518,7 +531,7 @@
 							  click="openFlashSettingsBtn_clickHandler(event)"/>
 					
 					<s:DropDownList id="selectedCamera_DDL"
-									width="100%" enabled="false"
+									width="100%" enabled="true"
 									change="selectedCamera_DDL_changeHandler(event)"
 									dataProvider="{new ArrayList(Camera.names)}"/>
 					
@@ -651,7 +664,7 @@
 						  click="openFlashSettingsBtn_clickHandler(event)"/>
 				
 				<s:DropDownList id="selectedMicrophone_DDL"
-								width="100%" enabled="false"
+								width="100%" enabled="true"
 								change="selectedMicrophone_DDL_changeHandler(event)"
 								dataProvider="{new ArrayList(Microphone.names)}"/>
 				

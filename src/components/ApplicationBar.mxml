@@ -202,8 +202,8 @@
 					  width="100" height="90%"
 					  label="Logout" right="0" 
 					  icon="{__iconManager.getIcon('app_door_out')}"
-					  click="parentApplication.loginPanel.disconnect()"/>
-			
+					  click="__appWideSingleton.loggedOut=true;parentApplication.loginPanel.disconnect()"/>
+			<!--  -->
 			<s:Button id="applicationBar_appSettings_Btn" 
 					  width="100" height="90%"
 					  label="Settings" icon="{__iconManager.getIcon('app_settings')}"

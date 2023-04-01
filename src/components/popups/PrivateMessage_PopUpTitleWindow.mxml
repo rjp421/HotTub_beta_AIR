@@ -167,21 +167,23 @@
 				parentApplication.loginPanel.nc.call("chatManager.sendPrivateMessage", null, parentApplication.lobby.mediaManager.clientID, msgObj);
 				
 				pmText_TA.htmlText += "<font size='12' color='#000000' face='Verdana'><b>"+parentApplication.lobby.mediaManager.userName+"</b>:  "+ pmText_TI.text +"</font>"+"\n";
+				pmText_TA.validateNow();
+				
 				if (pmText_TA.mx_internal::getTextField().numLines >= 30)
 				{
 					pmText_TA.htmlText = cleanChatHistory(pmText_TA.htmlText);
 					pmText_TA.validateNow();
 				}
 				
-				pmText_TA.validateNow();
 				pmText_TA.verticalScrollPosition = pmText_TA.maxVerticalScrollPosition;
 				pmText_TI.text = "";
 			}
 			
 			public function receivePrivateMessage(eventObj:Object):void
 			{
-				debugMsg("receivePrivateMessage->  fromUserName: "+eventObj.fromUserName+"  msg: "+eventObj.msg);
+				debugMsg("receivePrivateMessage->  ["+this.id+"]  fromUserName: "+eventObj.fromUserName+"  msg: "+eventObj.msg);
 				
+				//trace("PM RECEIVED!>>  this.id: "+this.id);
 				if (!msgObj.toUserID)
 				{
 					// this is a NEW received PM!
@@ -206,16 +208,15 @@
 				if (!parentApplication.lobby.isUserIgnored(parentApplication.lobby.userListPanel.getUserObj(eventObj.fromUserID).acctID, eventObj.fromUserName))
 				{
 					pmText_TA.htmlText += "<font size='12' color='#000000' face='Verdana'><b>"+parentApplication.lobby.userListPanel.getUserObj(eventObj.userID).userName+"</b>:  "+ eventObj.msg +"</font>"+"\n";
+					pmText_TA.validateNow();
 					if(pmText_TA.mx_internal::getTextField().numLines >= 30)
 					{
 						pmText_TA.htmlText = cleanChatHistory(pmText_TA.htmlText);
 						pmText_TA.validateNow();
 					}
-					pmText_TA.validateNow();
 					pmText_TA.verticalScrollPosition = pmText_TA.maxVerticalScrollPosition;
 				}
 				
-				trace("PM RECEIVED!>>  this.id: "+this.id);
 				eventObj = null;
 			}
 			
@@ -245,6 +246,7 @@
 			private function debugMsg(str:String):void
 			{
 				AppWideDebug_Singleton.getInstance().newDebugMessage('PrivateMessage_PopUpTitleWindow', str);
+				str = null;
 			}
 			
 			

@@ -1,13 +1,16 @@
- import flash.events.Event;
+import flash.events.Event;
 import flash.events.TextEvent;
 import flash.net.URLRequest;
 import flash.net.navigateToURL;
 
 import mx.controls.Alert;
 import mx.events.FlexEvent;
+import mx.managers.PopUpManager;
 import mx.utils.StringUtil;
 
 import spark.components.RadioButtonGroup;
+
+import components.popups.Reconnect_PopUpTitleWindow;
 
 import events.CustomEvent;
 
@@ -104,7 +107,7 @@ private function onApplicationCompleteHandler(event:Event):void
 			(__appWideSingleton.flashVars.url.length))
 		{
 			//parentApplication.applicationBar.applicationBar_titleText_L.text = "BongTVLive.com";
-			registerURL_T.htmlText = "<a href='event:https://www.gigglecams.com/register' target='new'>CREATE/EDIT YOUR ACCOUNT @ https://www.gigglecams.com/register</a>";
+			registerURL_T.htmlText = "<a href='event:https://whohacked.me/register' target='new'>CREATE/EDIT YOUR ACCOUNT @ https://whohacked.me/register</a>";
 			
 			/*
 			var urlArr:Array = __appWideSingleton.flashVars.url.toString().split("/");
@@ -381,9 +384,9 @@ public function connect(_params:Object):void
 	} else {
 		ncURI += "rtmpe";
 	}
-	//158.69.227.107
+	
 	ncURI += "://media.whohacked.me"+((__appWideSingleton.appInfoObj.selectedConnectionProtocol=='rtmps' ? ":4430":"") || 
-										(__appWideSingleton.appInfoObj.selectedConnectionProtocol=='rtmpt' ? ":81":""))+
+										(__appWideSingleton.appInfoObj.selectedConnectionProtocol=='rtmpt' ? ":80":""))+
 										"/tub2010_server/"+_params.roomName.toLowerCase();
 	/*ncURI += "://192.168.10.104/tub2010_server/"+_params.roomName.toLowerCase();*/
 	//ncURI += "://10.0.0.104/tub2010_server/"+_params.roomName.toLowerCase();/**/
@@ -495,6 +498,13 @@ private function onNCFailed(event:CustomEvent):void
 	
 	disconnect();
 	
+	// TEST: auto-reconnect
+	if (__appWideSingleton.loggedOut==true)
+	{
+		// disconnected before logout, reconnect
+		PopUpManager.createPopUp(this, Reconnect_PopUpTitleWindow, true);
+	}
+	
 	event = null;
 }
 
@@ -509,6 +519,13 @@ private function onNCRejected(event:CustomEvent):void
 	setLoginStatusInfo("Connection rejected!  Error: " + (errObj.application ? errObj.application.code : errObj.code));
 	
 	disconnect();
+	
+	// TEST: auto-reconnect
+	if (__appWideSingleton.loggedOut==true)
+	{
+		// disconnected before logout, reconnect
+		PopUpManager.createPopUp(this, Reconnect_PopUpTitleWindow, true);
+	}
 	
 	errObj = null;
 	event = null;
@@ -525,7 +542,12 @@ private function onNCClosed(event:CustomEvent):void
 	setLoginStatusInfo("Connection closed! Please login again.");
 	//Alert.show("Connection lost!"+"\n"+"Please login again."+"\n"+"\n"+"If this problem persists, try a lower quality and make sure there is not a problem with your internet connection.");
 	
-	// TODO: auto-reconnect
+	// TEST: auto-reconnect
+	// disconnected before logout, reconnect
+	if (__appWideSingleton.loggedOut==false)
+	{
+		PopUpManager.createPopUp(this, Reconnect_PopUpTitleWindow, true);
+	}
 	
 	event = null;
 }
@@ -563,6 +585,8 @@ private function loginFailed(event:CustomEvent):void
 
 private function onKicked(event:CustomEvent):void
 {
+	__appWideSingleton.loggedOut = true;
+	
 	setLoginStatusInfo("You have been kicked!");
 	
 	disconnect();
@@ -587,6 +611,8 @@ private function onKicked(event:CustomEvent):void
 
 private function onBanned(event:CustomEvent):void
 {
+	__appWideSingleton.loggedOut = true;
+	
 	setLoginStatusInfo("You have been banned!");
 	
 	disconnect();

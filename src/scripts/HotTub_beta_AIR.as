@@ -27,6 +27,7 @@ private var __appWideEventDispatcher:AppWideEventDispatcher_Singleton;
 
 public var debugMode:Boolean;
 
+// TODO remove all flashVars since AIR does not use them?
 // the ?prop1=var1&prop2=var2 query passed in the URL
 public var flashVars:Object;
 
@@ -34,7 +35,7 @@ public var flashVars:Object;
 
 private function preinitializeHandler(event:FlexEvent):void
 {
-	// not used with AIR
+	// AIR does not use this
 	//Security.allowDomain("*");
 	
 	__appWideSingleton = AppWide_Singleton.getInstance();
@@ -122,6 +123,9 @@ private function applicationCompleteHandler(event:FlexEvent):void
 private function createLobby(event:CustomEvent):void
 {
 	debugMsg("createLobby->  RECEIVED  userInfoObj: "+event.eventObj+"  clientID: "+event.eventObj.clientID+"  acctID: "+event.eventObj.acctID+"  userID: "+event.eventObj.userID);
+	
+	// re/set loggedOut to false
+	__appWideSingleton.loggedOut = false;
 	
 	__appWideSingleton.userInfoObj.clientID = event.cloneCustomEvent().eventObj.clientID;
 	__appWideSingleton.userInfoObj.acctID = event.cloneCustomEvent().eventObj.acctID;

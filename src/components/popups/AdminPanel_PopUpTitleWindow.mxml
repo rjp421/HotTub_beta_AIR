@@ -36,7 +36,7 @@
 			private var tmpFullAdminType_Arr:Array;
 			private var cmdObj:Object = new Object();
 			private var tmpObj:Object = new Object();
-			
+			private var resultReceived:Boolean = false;
 			
 			
 			private function creationCompleteHandler(event:FlexEvent):void
@@ -51,7 +51,7 @@
 				cmdObj.acctID = parentApplication.lobby.mediaManager.acctID;
 				cmdObj.userID = parentApplication.lobby.mediaManager.userID;
 				cmdObj.userName = parentApplication.lobby.mediaManager.userName;
-				cmdObj.roomName = parentApplication.loginPanel.roomName_TI.text;
+				cmdObj.roomName = (parentApplication.loginPanel.roomName_TI.text=="" ? "lobby" : parentApplication.loginPanel.roomName_TI.text);
 				cmdObj.selectedUserAcctID = parentApplication.lobby.userListPanel.userList_DG.selectedItem.acctID;
 				cmdObj.selectedUserID = parentApplication.lobby.userListPanel.userList_DG.selectedItem.userID;
 				cmdObj.selectedUserName = parentApplication.lobby.userListPanel.userList_DG.selectedItem.userName;
@@ -181,23 +181,21 @@
 			// handle response from mod.php
 			private function onGetUserPropertyResult(event:CustomEvent):void
 			{
-				var resultObj:Object = event.eventObj;
+				if (AppWideEventDispatcher_Singleton.getInstance().hasEventListener("onGetUserPropertyResult"))
+					AppWideEventDispatcher_Singleton.getInstance().removeEventListener("onGetUserPropertyResult", onGetUserPropertyResult);
+				
+				var resultObj:Object = event.cloneCustomEvent().eventObj;
 				
 				//tmpObj.resultObj = resultObj;
 				tmpFullAdminType_Arr = resultObj.resultAdminType.split(",");
 				
 				trace("onGetUserPropertyResult->  resultObj: "+resultObj+"  ok: "+resultObj.ok+"  status: "+resultObj.status+"  resultAdminType: "+resultObj.resultAdminType+"  tmpFullAdminType_Arr: "+tmpFullAdminType_Arr.toString());
 				
-				if (AppWideEventDispatcher_Singleton.getInstance().hasEventListener("onGetUserPropertyResult"))
-					AppWideEventDispatcher_Singleton.getInstance().removeEventListener("onGetUserPropertyResult", onGetUserPropertyResult);
-				
 				// update the admintype
 				tmpObj.selectedUserAdminType = resultObj.resultAdminType.toLocaleLowerCase();
 				
 				// set the current admin type
-				var adminType:String = resultObj.resultAdminType.toLowerCase().indexOf("_definst_") == -1 ?
-										resultObj.resultAdminType.split(cmdObj.roomName + ":")[1].split(",")[0] :
-										'notadmin';
+				var adminType:String = parseRoomAdminType().split(":")[1];
 				
 				//propVal_TI.text = tmpObj.resultObj.resultAdminType;
 				propVal_TI.text = resultObj.resultAdminType;
@@ -225,7 +223,15 @@
 				
 				tmpObj.selectedAdminType = selectedAdminType;
 				
-				trace("adminType_RBG_valueCommitHandler->  <SELECTED>  id: " + event.target.selection.id + "  selectedValue: "+event.target.selectedValue+"  selectedAdminType: "+selectedAdminType);
+				debugMsg("adminType_RBG_valueCommitHandler->  <SELECTED>  id: " + event.target.selection.id + "  selectedValue: "+event.target.selectedValue+"  selectedAdminType: "+selectedAdminType);
+				
+				// FIX dont run if this is the first time,
+				// after the admintype is received
+				if (resultReceived)
+					setRoomAdminType(selectedAdminType);
+				else
+					resultReceived = true;
+				
 				/*
 				var tmpPropValText:String = propVal_TI.text;
 				var adminSelected:Boolean = selectedAdminType != "notadmin";
@@ -299,15 +305,19 @@
 					{
 					}
 				}
-				*/
 				//propVal_TI.text = tmpObj.resultObj.resultAdminType;
 				
-				if (selectedAdminType != "notadmin")
+				if ((selectedAdminType=='sa')||(selectedAdminType=='ga'))
 				{
-					propVal_TI.text = "lobby:"+selectedAdminType;
+					propVal_TI.text = "_definst_:"+selectedAdminType;
+				} else if (selectedAdminType=='notadmin') {
+					// TODO per-room unmod
 				} else {
-					propVal_TI.text = "_definst_:notadmin"; 
+					// TODO per-room mod
+					//propVal_TI.text = "lobby:"+selectedAdminType;
+					propVal_TI.text = tmpFullAdminType_Arr.toString();
 				}
+				*/
 				/*
 				tmpReplaceStrWith = null;
 				tmpReplaceStr = null;
@@ -320,10 +330,72 @@
 			}
 			
 			
-			// parse and return the roomName:adminType for the current room
+			private function setRoomAdminType(newAdminType:String):void
+			{
+				debugMsg("setRoomAdminType->  "+newAdminType);
+				
+				var roomName:String = cmdObj.roomName;
+				
+				if ((newAdminType=='sa')||(newAdminType=='ga')) {
+					// TODO remove all items and then push _definst_:sa
+					tmpFullAdminType_Arr.splice(0);
+					tmpFullAdminType_Arr.push("_definst_:"+newAdminType);
+				} else {
+					// remove sa/ga if they exist
+					if (tmpFullAdminType_Arr.indexOf("_definst_:sa")!=-1) tmpFullAdminType_Arr.splice(tmpFullAdminType_Arr.indexOf("_definst_:sa"),1);
+					if (tmpFullAdminType_Arr.indexOf("_definst_:ga")!=-1) tmpFullAdminType_Arr.splice(tmpFullAdminType_Arr.indexOf("_definst_:ga"),1);
+					
+					var tmpPropValIndex:int = 0;
+					var tmpPropValStr:String = "";
+					
+					// replace/add/remove the item from the array
+					for (var i:int = 0; i < tmpFullAdminType_Arr.length; ++i) 
+					{
+						if (tmpFullAdminType_Arr[i].split(':')[0] == cmdObj.roomName)
+						{
+							tmpPropValIndex = i;
+							tmpPropValStr = tmpFullAdminType_Arr[i];
+							break;
+						}
+					}
+					
+					// if there is already an item for this room
+					if (tmpPropValStr.split(':')[0] == cmdObj.roomName)
+					{
+						if (newAdminType=='notadmin')
+						{
+							// TODO delete this item from the tmpFullAdminType_Arr
+							tmpFullAdminType_Arr.splice(i, 1);
+							
+							if (tmpFullAdminType_Arr.length==0)
+								tmpFullAdminType_Arr.push("_definst_:notadmin");
+						} else if ((newAdminType=='rh')||(newAdminType=='ra')||(newAdminType=='rm')) {
+							// replace existing item
+							tmpFullAdminType_Arr[tmpPropValIndex] = roomName+":"+newAdminType; // FIX
+						}
+					} else {
+						if ((tmpFullAdminType_Arr.length==1)&&(tmpFullAdminType_Arr[0]=="_definst_:notadmin"))
+							tmpFullAdminType_Arr.splice(0);
+						
+						// if an item for this room does not yet exist, push a new item
+						tmpFullAdminType_Arr.push(roomName+":"+newAdminType);
+					}
+					
+					tmpPropValStr = null;
+				}
+				
+				propVal_TI.text = tmpFullAdminType_Arr.toString();
+				
+				roomName = null;
+				newAdminType = null;
+			}
+			
+			
+			// TEST str.split(searchstr).join(replacestr);
+			// parse and return the 'roomName:adminType' for the current room
 			private function parseRoomAdminType():String
 			{
-				var retStr:String = '';
+				var retStr:String = '_definst_:notadmin';
 				
 				for (var i:int = 0; i < tmpFullAdminType_Arr.length; ++i) 
 				{
@@ -332,6 +404,7 @@
 					if (tmpPropValStr.split(':')[0] == cmdObj.roomName)
 					{
 						retStr = tmpPropValStr;
+						break;
 					}
 					
 					tmpPropValStr = null;
@@ -405,7 +478,7 @@
 			
 			protected function isAdvancedViewSelected_CB_changeHandler(event:Event):void
 			{
-				trace("isAdvancedViewSelected_CB_changeHandler->  <CALLED>  isAdvancedViewSelected_CB.selected: " + isAdvancedViewSelected_CB.selected);
+				debugMsg("isAdvancedViewSelected_CB_changeHandler->  <CALLED>  isAdvancedViewSelected_CB.selected: " + isAdvancedViewSelected_CB.selected);
 				
 				// show/hide advanced options
 				var _isAdvancedViewSelected:Boolean = isAdvancedViewSelected_CB.selected;
@@ -494,6 +567,7 @@
 			private function debugMsg(str:String):void
 			{
 				AppWideDebug_Singleton.getInstance().newDebugMessage(this.id, str);
+				str = null;
 			}
 			
 			
