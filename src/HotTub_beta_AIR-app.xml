@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <application xmlns="http://ns.adobe.com/air/application/50.0">
 	<id>me.whohacked.HotTub</id>
-	<versionNumber>0.0.1</versionNumber>
+	<versionNumber>0.0.2</versionNumber>
 	<filename>HotTub_beta_AIR</filename>
 	<name>HotTub_beta_AIR</name>
 	<initialWindow>

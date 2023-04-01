@@ -17,7 +17,6 @@
 	</fx:Script>
 	
 	
-	
 	<!-- FILTERS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 	<!--
 	<s:filters>
@@ -75,6 +74,12 @@
 								 width="160" height="100%"
 								 left="0"/>
 			
+			<s:CheckBox id="autoScroll_CB"
+						selected="true"
+						label="Auto-Scroll"
+						fontSize="8"
+						valueCommit="autoScroll_CB_valueCommitHandler(event)"/>
+			
 			<components:CamControlBar id="camControlBar"
 									  width="100%" height="100%"/>
 			
@@ -82,14 +87,14 @@
 					  width="30" height="25"
 					  useHandCursor="true" 
 					  icon="{IconManager_Singleton.getInstance().getIcon('app_refillCams')}"
-					  click="parentApplication.lobby.autoDockCams()"
-					  toolTip="Refills all empty cam spots with a new user."/>
+					  click="parentApplication.lobby.autoDockCams(true)"
+					  toolTip="Refills empty cam spots."/>
 			
-			<s:Button id="logoutBtn"
+<!--			<s:Button id="logoutBtn"
 					  width="70" height="100%"
 					  label="Logout" right="0" 
 					  click="parentApplication.loginPanel.disconnect()"/>
-<!--					  icon="{IconManager_Singleton.getInstance().getIcon('app_door_out')}"
+					  icon="{IconManager_Singleton.getInstance().getIcon('app_door_out')}"
 -->			
 		</s:HGroup>
 		

@@ -43,7 +43,7 @@ BongTVLive.com Hot Tub 2.0 beta7 by b0nghitter
 	
 	<!-- SCRIPTS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 	
-	<fx:Script source="scripts/HotTub_beta_AIR.as"/>
+	<fx:Script source="scripts\\HotTub_beta_AIR.as"/>
 	
 	
 	
@@ -51,7 +51,7 @@ BongTVLive.com Hot Tub 2.0 beta7 by b0nghitter
 	
 	<!-- CSS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 	
-	<fx:Style source="assets/CSS/HotTub.css"/>
+	<fx:Style source="assets\CSS\HotTub.css"/>
 	
 	
 	

@@ -89,6 +89,11 @@ private function camSpotCreationCompleteHandler(event:FlexEvent):void
 	
 	setupUserInfoObj();
 	
+	//if (!__appWideEventDispatcher.hasEventListener("setHost"))
+	//{
+	//	__appWideEventDispatcher.addEventListener("setHost", setHost, false,0,true);
+	//}
+	
 	event.stopPropagation();
 	
 	event = null;
@@ -104,8 +109,8 @@ private function setupUserInfoObj():void
 	userInfoObj.userID = '0';
 	userInfoObj.userName = '';
 	userInfoObj.defaultQuality = __appWideSingleton.appInfoObj.defaultQuality;
-	userInfoObj.viewedByUserIDs_A = __appWideSingleton.userInfoObj.viewedByUserIDs_A;
-	userInfoObj.heardByUserIDs_A = __appWideSingleton.userInfoObj.heardByUserIDs_A;
+	//userInfoObj.viewedByUserIDs_A = __appWideSingleton.userInfoObj.viewedByUserIDs_A;
+	//userInfoObj.heardByUserIDs_A = __appWideSingleton.userInfoObj.heardByUserIDs_A;
 	userInfoObj.volume = 0.7;
 	userInfoObj.isPrivate = false;
 	userInfoObj.isUsersVideoOn = false;
@@ -114,6 +119,7 @@ private function setupUserInfoObj():void
 	userInfoObj.isPlayingAudio = false;
 	userInfoObj.wasPlayingVideo = false;
 	userInfoObj.wasPlayingAudio = false;
+	userInfoObj.isManuallyUnmuted = false;
 	
 	userMetaData = new Object();
 }
@@ -230,6 +236,9 @@ public function attachUser(userObj:Object):void
 		"  isUsersAudioOn: "+userObj.isUsersAudioOn+
 		"  isPlayingVideo: "+userObj.isPlayingVideo+
 		"  isPlayingAudio: "+userObj.isPlayingAudio+
+		"  isManuallyUnmuted: "+userObj.isManuallyUnmuted+
+		"  wasPlayingVideo: "+userObj.wasPlayingVideo+
+		"  wasPlayingAudio: "+userObj.wasPlayingAudio+
 		"  defaultQuality: "+userObj.defaultQuality+
 		"  isUseOthersQualityChecked: "+__appWideSingleton.appInfoObj.isUseOthersQualityChecked);
 	
@@ -237,7 +246,32 @@ public function attachUser(userObj:Object):void
 	if (userObj.userID != userInfoObj.userID)
 	{
 		// set the new user object
-		userInfoObj = userObj;
+		//userInfoObj = userObj;
+		userInfoObj.acctID = userObj.acctID;
+		userInfoObj.acctName = userObj.acctName;
+		userInfoObj.userID = userObj.userID;
+		userInfoObj.userName = userObj.userName;
+		userInfoObj.isPlayingVideo = userObj.isPlayingVideo;
+		userInfoObj.isPlayingAudio = userObj.isPlayingAudio;
+		userInfoObj.wasPlayingVideo = userObj.wasPlayingVideo;
+		userInfoObj.wasPlayingAudio = userObj.wasPlayingAudio;
+		
+		if ((userObj.isUsersVideoOn!=null)&&(userObj.isUsersVideoOn!=undefined))
+		{
+			userInfoObj.isUsersVideoOn = userObj.isUsersVideoOn;
+		}
+		if ((userObj.isUsersAudioOn!=null)&&(userObj.isUsersAudioOn!=undefined))
+		{
+			userInfoObj.isUsersAudioOn = userObj.isUsersAudioOn;
+		}
+		if ((userObj.isManuallyUnmuted!=null)&&(userObj.isManuallyUnmuted!=undefined))
+		{
+			userInfoObj.isManuallyUnmuted = userObj.isManuallyUnmuted;
+		}
+		if ((userObj.volume!=null)&&(userObj.volume!=undefined))
+		{
+			userInfoObj.volume = userObj.volume;
+		}
 		
 		// create the Video and UIComponent
 		setupVideo();
@@ -245,18 +279,17 @@ public function attachUser(userObj:Object):void
 		// if this is the local user, show the local camera
 		if (userInfoObj.userID == parentApplication.lobby.mediaManager.userID)
 		{
-			// attach the local camera to the video
-			__camSpot_V.attachCamera(parentApplication.lobby.mediaManager.camera);
+			// attach the local camera to the video (move to MediaManager startVideo?)
+			if (parentApplication.lobby.mediaManager.isMyVideoOn)
+			{
+				__camSpot_V.attachCamera(parentApplication.lobby.mediaManager.camera);
+				
+				userInfoObj.isPlayingVideo = true;
+			}
 			
-			userInfoObj.isPlayingVideo = true;
-			
-			// TODO, figure out what this is for? typo?
+			// TODO (move to MediaManager startAudio?)
 			__appWideEventDispatcher.addEventListener('onLocalUserPublishAudio', onLocalUserPublishAudio, false,0,true);
 			
-			// TODO:
-			// create/show the vumeter image and mask
-			// TEST
-			// use MXML BMI/mask
 			if (parentApplication.lobby.mediaManager.isMyAudioOn)
 			{
 				startVUMeter();
@@ -266,12 +299,13 @@ public function attachUser(userObj:Object):void
 			// TODO: ask for permission if the other user is set to private.
 			
 			// override the defaultQuality with the local setting
-			if (!__appWideSingleton.appInfoObj.isUseOthersQualityChecked)
-				userInfoObj.defaultQuality = __appWideSingleton.appInfoObj.defaultQuality;
+			if (__appWideSingleton.appInfoObj.isUseOthersQualityChecked)
+				userInfoObj.defaultQuality = userObj.defaultQuality;
 			
 			// setup the NetStream
 			setupNetStream();
 			
+			// FIX
 			// set any previously defined volume
 			if (userInfoObj.volume)
 			{
@@ -304,22 +338,23 @@ public function attachUser(userObj:Object):void
 					playMedia("video",true);
 				}
 			} else {
+				videoOnOffBtn.source = null;
 				videoOnOffBtn.source = __iconManager.getIcon('app_videoOff');
 			}
 			
 			// play the audio of the room host if selected
 			if ((__appWideSingleton.appInfoObj.isUnmuteRoomHostChecked == true) &&
-				(userInfoObj.adminType == "rh"))
+				(parentApplication.lobby.userListPanel.getUserObj(userInfoObj.userID).isHost))
 			{
 				playMedia("audio",true);
-				// else check whether the users audio is on/off
+			// else check whether the users audio is on/off (move?)
 			} else if (userInfoObj.isUsersAudioOn) {
 				// if allAudioOffOnJoin_CB is selected
-				if (parentApplication.loginPanel.allAudioOffOnJoin_CB.selected)
+				if (__appWideSingleton.appInfoObj.isAllAudioOffChecked)
 				{
+					// already playing the audio before switching cams
 					if (userInfoObj.isPlayingAudio)
 					{
-						// already playing the audio before switching cams
 						playMedia("audio",true);
 					} else {
 						// dont play the audio
@@ -338,6 +373,44 @@ public function attachUser(userObj:Object):void
 	userObj = null;
 }
 
+/*
+// TEST:
+// moved to Lobby.as
+private function setHost(userID:Number):void
+{
+	debugMsg("setHost->  userID: "+userID);
+	
+	if (userInfoObj.userID == 0)
+	{
+		// CamSpot is empty, exit
+		return;
+	}
+	
+	// TODO
+	// if this is not the main cam,
+	// and this is now the host,
+	// then swap it with the main cam
+	
+	// TODO: fix auto un/mute room host
+	// TODO: fix un/mute of new/old hosts 
+	
+	// if the room host on main option is on
+	if (__appWideSingleton.appInfoObj.isRoomHostOnMainChecked)
+	{
+		// if this is cam is already playing the new host,
+		// or the host was reset, and this cam is playing 
+		// the main host, then swap to main
+		//
+		if ((userInfoObj.userID == userID)||
+			((userID==0)&&
+				(parentApplication.lobby.userListPanel.getUserObj(userInfoObj.userID).adminType=="rh")))
+		{
+			userInfoObj.isHost = true;
+			parentApplication.lobby.switchToMain(userInfoObj);
+		}
+	}
+}
+*/
 
 // TEST:
 private function onLocalUserPublishAudio(event:CustomEvent):void
@@ -448,9 +521,11 @@ public function gotMicData(micData:SampleDataEvent):void
 }
 
 
-private function playMedia(media:String, onOff:Boolean):void
+public function playMedia(media:String, onOff:Boolean):void
 {
 	debugMsg("playMedia->  media: "+media+"  onOff: "+onOff);
+	
+	if (!__camSpot_NS) return;
 	
 	switch (media)
 	{
@@ -926,6 +1001,8 @@ private function audioOnOffBtn_clickHandler(event:MouseEvent):void
 		isPlayingAudio = false;
 		
 		userInfoObj.isPlayingAudio = false;
+		if (userInfoObj.isManuallyUnmuted) 
+			userInfoObj.isManuallyUnmuted = false;
 		
 		audioOnOffBtn.source = null;
 		audioOnOffBtn.source = __iconManager.getIcon('app_audioOff');
@@ -939,6 +1016,7 @@ private function audioOnOffBtn_clickHandler(event:MouseEvent):void
 		isPlayingAudio = true;
 		
 		userInfoObj.isPlayingAudio = true;
+		userInfoObj.isManuallyUnmuted = true;
 		
 		audioOnOffBtn.source = null;
 		audioOnOffBtn.source = __iconManager.getIcon('app_audioOn');

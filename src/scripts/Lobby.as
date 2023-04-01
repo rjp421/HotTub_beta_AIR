@@ -114,6 +114,11 @@ private function lobbyCreationCompleteHandler(event:FlexEvent):void
 		__appWideEventDispatcher.addEventListener('userList_removeUser', userList_removeUser, false,0,true);
 	*/
 	
+	if (!__appWideEventDispatcher.hasEventListener("setHost"))
+	{
+		__appWideEventDispatcher.addEventListener("setHost", setHost, false,0,true);
+	}
+	
 	event = null;
 }
 
@@ -445,7 +450,7 @@ public function isUserDocked(userID:Number):Boolean
 
 
 
-public function autoDockCams():void
+public function autoDockCams(resetDoNotDock:Boolean=false):void
 {
 	if (__appWideSingleton.appInfoObj.isAutoFillCamsChecked)
 	{
@@ -460,16 +465,22 @@ public function autoDockCams():void
 		{
 			for (var o:Object in userListPanel.userList_DP)
 			{
-				if ((userListPanel.userList_DP[o].adminType == "rh") &&
+				if ((userListPanel.userList_DP[o].doNotDock==true)&&
+					(resetDoNotDock)) 
+					userListPanel.userList_DP[o].doNotDock=false;
+				
+				if ((userListPanel.userList_DP[o].isHost) &&
 					(userListPanel.userList_DP[o].isUsersVideoOn) &&
-					(userListPanel.userList_DP[o].doNotDock==false))
+					(userListPanel.userList_DP[o].doNotDock==false) && 
+					(((!isUserIgnored(userListPanel.userList_DP[o].acctID, (userListPanel.userList_DP[o].acctID==0 ? userListPanel.userList_DP[o].userName : userListPanel.userList_DP[o].nonDuplicateName))) && 
+					(!userListPanel.userList_DP[o].hasBlocked))))
 				{
 					dockCamSpot(userListPanel.userList_DP[o]);
 					break;
 				}
+				
+				o = null;
 			}
-			
-			o = null;
 		}
 		
 		// create an array or object with all the userIDs of users with their video on,
@@ -482,9 +493,15 @@ public function autoDockCams():void
 		// who is not already docked.
 		for (var i:int = 0; i < userListPanel.userList_DP.length; ++i) 
 		{
+			if ((userListPanel.userList_DP[i].doNotDock==true)&&
+				(resetDoNotDock)) 
+				userListPanel.userList_DP[i].doNotDock=false;
+			
 			if ((userListPanel.userList_DP[i].isUsersVideoOn) &&
 				(userListPanel.userList_DP[i].doNotDock==false) &&
-				(!isUserDocked(userListPanel.userList_DP[i].userID)))
+				(!isUserDocked(userListPanel.userList_DP[i].userID)) && 
+				(((!isUserIgnored(userListPanel.userList_DP[i].acctID, (userListPanel.userList_DP[i].acctID==0 ? userListPanel.userList_DP[i].userName : userListPanel.userList_DP[i].nonDuplicateName))) && 
+				(!userListPanel.userList_DP[i].hasBlocked))))
 			{
 				// add the 'user_X' userID to the dockedUserIDs_AC array
 				usersWithVideoOn_A.push(userListPanel.userList_DP[i]);
@@ -683,6 +700,7 @@ public function isUserIgnored(acctID:Number, userName:String):Boolean
 }
 
 
+// TODO/FIX
 public function receivePrivateMessage(event:CustomEvent):void
 {
 	debugMsg("receivePrivateMessage->  fromUserName: "+event.eventObj.fromUserName+"  toUserName: "+event.eventObj.toUserName+"  msg: "+event.eventObj.msg);
@@ -758,6 +776,91 @@ public function onGetBlockedUsersListResultHandler(event:CustomEvent):void
 	//PopUpManager.createPopUp(parentApplication.lobby, BlockList_PopUpTitleWindow, false);
 	
 	_tmpObj = null;
+	event = null;
+}
+
+
+// TODO
+// currentHostUserID should only be 0
+// if there is not a main or temp host.
+// userID should be the host of the new host,
+// or 0 for no host
+private function setHost(event:CustomEvent):void
+{
+	debugMsg("setHost->  userID: "+event.eventObj.userID+"  currentHostUserID: "+__appWideSingleton.appInfoObj.currentHostUserID);
+	
+	var hostCamSpot:String;
+	//var hostUserObj:Object;
+	var oldHostUserID:Number;
+	
+	// TEST
+	if (__appWideSingleton.appInfoObj.currentHostUserID.toString()!='0')
+	{
+		oldHostUserID = __appWideSingleton.appInfoObj.currentHostUserID;
+		
+		// reference the current host, change to new host later
+		hostCamSpot = whichCamSpot(oldHostUserID);
+		//hostUserObj = this.userListPanel.getUserObj(oldHostUserID);
+		
+		// if current host is not manually unmuted
+		if ((hostCamSpot!='notDocked')&&
+			(this[hostCamSpot])&&
+			(this[hostCamSpot].userInfoObj.isManuallyUnmuted==false))
+		{
+			// mute the current host
+			
+			// dont mute if the cam is the local user
+			if (mediaManager.userID!=oldHostUserID)
+				this[hostCamSpot].playMedia("audio", false);
+		}
+	}
+	
+	/*
+	// if userID is currentHostUserID or 0
+	if ((event.eventObj.userID.toString()=='0')&&
+		(event.eventObj.userID==__appWideSingleton.appInfoObj.currentHostUserID))
+	{
+		// TODO
+		// reset host to main host
+		
+		// TODO
+		// switchToMain the new host
+	} else if ((event.eventObj.userID.toString()!='0')&&
+				(event.eventObj.userID!=__appWideSingleton.appInfoObj.currentHostUserID)) {
+		// else unset main host, and set temp host
+	}
+	*/
+	// un/set users isHost in the UserList
+	this.userListPanel.setHost(event.eventObj.userID);
+	
+	// set currentHostUserID to the new hosts userID
+	__appWideSingleton.setAppInfo("currentHostUserID", event.eventObj.userID);
+	
+	// TEMP exit if userID==0
+	if (event.eventObj.userID.toString()=='0') return;
+	
+	// TEST, REDO/FIX
+	hostCamSpot = whichCamSpot(__appWideSingleton.appInfoObj.currentHostUserID);
+	//hostUserObj = this.userListPanel.getUserObj(__appWideSingleton.appInfoObj.currentHostUserID);
+	
+	// TEST
+	// if the new host is already docked
+	if (hostCamSpot != 'notDocked')
+	{
+		if (hostCamSpot=="camSpot6")
+		{
+			// new host already on main, unmute
+			if (__appWideSingleton.appInfoObj.isUnmuteRoomHostChecked==true)
+				this[hostCamSpot].playMedia("audio", true);
+		} else {
+			// user is not on main yet, switchToMain
+			if (__appWideSingleton.appInfoObj.isRoomHostOnMainChecked==true)
+				switchToMain(this[hostCamSpot].userInfoObj);
+		}
+	}
+	
+	//hostUserObj = null;
+	hostCamSpot = null;
 	event = null;
 }
 

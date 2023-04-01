@@ -99,12 +99,10 @@
 		
 		
 		<s:Label width="80%" paddingTop="5"
-				 visible="false" includeInLayout="false"
 				 text="Room:"/>
 		
 		<s:TextInput id="roomName_TI" 
 					 width="260" maxChars="42" 
-					 visible="false" includeInLayout="false"
 					 restrict="A-Z a-z 0-9 \u0020-\u007E" 
 					 prompt="lobby (default)" 
 					 toolTip="The name of the room, or leave it blank to enter the lobby. 42 chars max!" 
@@ -444,12 +442,12 @@
 		
 		
 		<mx:Text id="registerURL_T" width="80%"
-				 selectable="true" visible="false"
+				 selectable="true"
 				 condenseWhite="true"
 				 link="registerURL_linkHandler(event)">
 			<mx:htmlText>
 				<![CDATA[
-					<a href='event:https://media.BongTVLive.com/register' target='_blank'>CREATE/EDIT YOUR ACCOUNT @ https://media.BongTVLive.com/register</a>
+					<a href='event:https://www.gigglecams.com/register' target='_blank'>CREATE/EDIT YOUR ACCOUNT @ https://www.gigglecams.com/register</a>
 				]]>
 			</mx:htmlText>
 		</mx:Text>

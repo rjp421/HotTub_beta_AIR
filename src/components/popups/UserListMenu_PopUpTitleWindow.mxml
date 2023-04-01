@@ -167,14 +167,14 @@
 					viewItem.label = "View";
 					viewItem.cmd = "view";
 					userListMenu_DP.addItem(viewItem);
-/*					if (selectedUserObj.userID != localUserID)
+					if (selectedUserObj.userID != localUserID)
 					{
 						pmItem.label = "PM user (NOT WORKING)";
 						pmItem.cmd = "pm";
 						userListMenu_DP.addItem(pmItem);
 					}
-*/				}
-				
+				}
+/**/				
 				var whoisItem:Object = new Object();
 				whoisItem.label = "Whois";
 				whoisItem.cmd = "whois";
@@ -241,7 +241,6 @@
 				
 				var setModItem:Object = new Object();
 				if ((selectedUserObj.acctID != 0) && 
-
 					(selectedUserObj.userID != localUserID) &&
 					((selectedUserObj.adminType != "sa") &&
 					(parentApplication.lobby.userListPanel.getUserObj(localUserID).adminType == "sa"||
@@ -253,6 +252,19 @@
 					userListMenu_DP.addItem(setModItem);
 				}
 				
+				var setHostItem:Object = new Object();
+				if ((selectedUserObj.adminType != "rh") &&
+					(parentApplication.lobby.userListPanel.getUserObj(localUserID).adminType == "sa"||
+						parentApplication.lobby.userListPanel.getUserObj(localUserID).adminType=="ga"||
+						parentApplication.lobby.userListPanel.getUserObj(localUserID).adminType=="rh"||
+						parentApplication.lobby.userListPanel.getUserObj(localUserID).adminType=="ra"||
+						parentApplication.lobby.userListPanel.getUserObj(localUserID).adminType=="rm"))
+				{
+					setHostItem.label = "(Un)set Host";
+					setHostItem.cmd = "sethost";
+					userListMenu_DP.addItem(setHostItem);
+				}
+				
 				viewItem = null;
 				pmItem = null;
 				whoisItem = null;
@@ -260,6 +272,7 @@
 				banItem = null;
 				banIPItem = null;
 				setModItem = null;
+				setHostItem = null;
 			}
 			
 			
@@ -302,10 +315,10 @@
 						}
 						break;
 					case "pm" :
-						//parentApplication.lobby.userListPanel.userCmdObj = cmdObj;
-						//trace("userListMenu|>  popUpMenu: "+parentApplication.lobby.userListPanel.popUpMenu+"  CURRENT openPopUps_AC.length:  "+parentApplication.lobby.openPopUps_AC.length);
-						//PopUpManager.createPopUp(parentApplication.lobby, PrivateMessage_PopUpTitleWindow, false);
-						//trace("userListMenu|>  NEW openPopUps_AC.length:  "+parentApplication.lobby.openPopUps_AC.length);
+						parentApplication.lobby.userListPanel.userCmdObj = cmdObj;
+						trace("userListMenu|>  popUpMenu: "+parentApplication.lobby.userListPanel.popUpMenu+"  CURRENT openPopUps_AC.length:  "+parentApplication.lobby.openPopUps_AC.length);
+						PopUpManager.createPopUp(parentApplication.lobby, PrivateMessage_PopUpTitleWindow, false);
+						trace("userListMenu|>  NEW openPopUps_AC.length:  "+parentApplication.lobby.openPopUps_AC.length);
 						break;
 					case "whois":
 						parentApplication.loginPanel.nc.call("adminCmd", null, cmdObj);
@@ -355,6 +368,11 @@
 						parentApplication.lobby.tmpStr = 'setmod';
 						parentApplication.lobby.userListPanel.popUpMenu = null;
 						PopUpManager.createPopUp(parentApplication.lobby, AdminPanel_PopUpTitleWindow, true);
+						break;
+					case "sethost":
+						parentApplication.lobby.tmpStr = 'sethost';
+						parentApplication.lobby.userListPanel.popUpMenu = null;
+						parentApplication.loginPanel.nc.call("adminCmd", null, cmdObj);
 						break;
 				}
 				

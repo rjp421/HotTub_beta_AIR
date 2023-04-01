@@ -98,6 +98,13 @@ public function receiveMessage(event:CustomEvent):void
 				msgObj.userName = '* DEBUG:  ' + ((msgObj.src != undefined) ? msgObj.src : '');
 		}
 		
+		// TEST
+		if (__appWideSingleton.appInfoObj.isShowTimestampsChecked)
+		{
+			//msgObj.userName = "["+(new Date().hours)+":"+(new Date().minutes)+":"+(new Date().seconds)+"] "+msgObj.userName;
+			//msgObj.userName = "["+(new Date().toTimeString().split(" ")[0])+"]"+msgObj.userName;
+		}
+		
 		if (fontControlBar.allFontSize_CB.selected)
 		{
 			msgObj.fontSize = chatTextFormat.fontSize;
@@ -134,7 +141,7 @@ public function receiveMessage(event:CustomEvent):void
 		{
 			showMsg("<font size='"+msgObj.fontSize+"' color='"+msgObj.fontColor+"' face='Verdana'><b>* "+msgObj.userName+"</b>  "+bold+italics+underline+ msgObj.msg +underlineEnd+italicsEnd+boldEnd+"</font>");
 		} else {
-			showMsg("<font size='"+msgObj.fontSize+"' color='"+msgObj.fontColor+"' face='Verdana'><b>"+msgObj.userName+"</b>:  "+bold+italics+underline+ msgObj.msg +underlineEnd+italicsEnd+boldEnd+"</font>");
+			showMsg("<font size='"+msgObj.fontSize+"' color='"+msgObj.fontColor+"' face='Verdana'><b>"+(__appWideSingleton.appInfoObj.isShowTimestampsChecked?"["+(new Date().toTimeString().split(" ")[0])+"] ":"")+msgObj.userName+"</b>:  "+bold+italics+underline+ msgObj.msg +underlineEnd+italicsEnd+boldEnd+"</font>");
 		}
 		
 		bold = null;
@@ -180,9 +187,11 @@ private function showMsg(htmlText:String):void
 		chatTextArea.chatTextArea_TA.htmlText += htmlText + "<br />";
 	}
 	
-	chatTextArea.chatTextArea_TA.validateNow();
-	chatTextArea.chatTextArea_TA.verticalScrollPosition = chatTextArea.chatTextArea_TA.maxVerticalScrollPosition + 5;
-	
+	if (autoScroll_CB.selected)
+	{
+		chatTextArea.chatTextArea_TA.validateNow();
+		chatTextArea.chatTextArea_TA.verticalScrollPosition = chatTextArea.chatTextArea_TA.maxVerticalScrollPosition + 5;
+	}
 	/*
 	// force gc to prevent leaking
 	try {
@@ -332,7 +341,7 @@ public function userEnterLeave(userName:String, inOut:String):void
 {
 	debugMsg("userEnterLeave->  userName: "+userName+"  inOut: "+inOut);
 	
-	showMsg("<font size='"+chatTextFormat.fontSize+"' face='Verdana' color='#19B819'><b>* "+userName+" "+inOut+" the room</b></font>");
+	showMsg("<font size='"+chatTextFormat.fontSize+"' face='Verdana' color='#19B819'><b>"+(__appWideSingleton.appInfoObj.isShowTimestampsChecked?"["+(new Date().toTimeString().split(" ")[0])+"] ":"")+"* "+userName+" "+inOut+" the room</b></font>");
 	
 	/*
 	chatTextArea.chatTextArea_TA.htmlText += "<font size='14' face='Verdana' color='#19B819'><b>* "+userName+" "+inOut+" the room</b></font>"+"\n";
@@ -356,12 +365,13 @@ public function showIntroText():void
 	
 	showMsg("<font size='12' face='Verdana' color='#FF0000'><b>* ***HOW TO USE***</b></font>");
 	showMsg("<font size='12' face='Verdana' color='#393939'><b>* DOUBLE CLICK A USER IN THE LIST TO VIEW THEIR CAM</b></font>");
+	showMsg("<font size='12' face='Verdana' color='#393939'><b>* CLICK THE UN/MUTE BUTTON ON A CAM TO TOGGLE MUTE</b></font>");
 	showMsg("<font size='12' face='Verdana' color='#393939'><b>* CLICK THE ARROW BUTTON TO SWITCH THE CAM BETWEEN THE SMALL/MAIN CAMS</b></font>");
 	showMsg("<font size='12' face='Verdana' color='#393939'><b>* DRAG AND DROP THE CAMS TO ANY SPOT YOU WANT</b></font>");
 	showMsg("<font size='11' face='Verdana' color='#FF0000'><b>* TO ZOOM: CLICK OUTSIDE OF THE CHAT, CTRL +/-/MOUSEWHEEL</b></font>"+"\n");
-	showMsg("<font size='11' face='Verdana' color='#FF0000'><b>* IF YOU LAG: TRY LOW QUALITY, CLOSE SOME CAMS, OR TRY RTMFP AT THE BOTTOM DURING LOGIN.</b></font>"+"\n");
-	showMsg("<font size='12' face='Verdana' color='#FF0000'><b>* </b></font>"+"\n");
-	showMsg("<font size='11' face='Verdana' color='#FF0000'><b>* WANT TO TRY THE LATEST FEATURES? <u><a href='https://media.BongTVLive.com/test/' target='_self'><font color='#0000FF'>CLICK HERE!</font></a></u></b></font>"+"\n");
+	showMsg("<font size='11' face='Verdana' color='#FF0000'><b>* IF YOU LAG: TRY LOW/MED QUALITY, CLOSE SOME CAMS, AND TRY RTMFP AT THE BOTTOM DURING LOGIN.</b></font>"+"\n");
+	//showMsg("<font size='12' face='Verdana' color='#FF0000'><b>* </b></font>"+"\n");
+	//showMsg("<font size='11' face='Verdana' color='#FF0000'><b>* WANT TO TRY THE LATEST FEATURES? <u><a href='https://media.BongTVLive.com/test/' target='_self'><font color='#0000FF'>CLICK HERE!</font></a></u></b></font>"+"\n");
 	//showMsg("<font size='12' face='Verdana' color='#FF0000'><b>* </b></font>"+"\n");
 }
 
@@ -376,6 +386,13 @@ public function close():void
 	chatTextArea.chatTextArea_TA.text = null;
 }
 
+
+
+private function autoScroll_CB_valueCommitHandler(event:FlexEvent):void
+{
+	
+	
+}
 
 
 

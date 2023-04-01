@@ -18,6 +18,7 @@ import events.CustomEvent;
 
 import me.whohacked.app.AppWideDebug_Singleton;
 import me.whohacked.app.AppWideEventDispatcher_Singleton;
+import me.whohacked.app.AppWide_Singleton;
 import me.whohacked.app.IconManager_Singleton;
 
 import scripts.net.UserListSOClient;
@@ -117,6 +118,11 @@ public function initUserList():void
 	{
 		__appWideEventDispatcher.addEventListener("onGetBlockedUsersListResult", onGetBlockedUsersListResult, false,0,true);
 	}
+	
+	//if (!__appWideEventDispatcher.hasEventListener("setHost"))
+	//{
+	//	__appWideEventDispatcher.addEventListener("setHost", setHost, false,0,true);
+	//}
 }
 
 
@@ -184,11 +190,13 @@ public function userList_onGetUserList(event:CustomEvent):void
 			tmpObj.isMyVideoOn = parentApplication.lobby.mediaManager.isMyVideoOn;
 			tmpObj.isMyAudioOn = parentApplication.lobby.mediaManager.isMyAudioOn;
 			tmpObj.doNotDock = false;
+			//tmpObj.isHost = false;
 		} else {
 			// else this is another user
 			tmpObj.isViewing = false;
 			tmpObj.isListening = false;
 			tmpObj.doNotDock = false;
+			//tmpObj.isHost = false;
 		}
 		
 		tmpObj.userName = StringUtil.trim(tmpObj.userName);
@@ -206,6 +214,9 @@ public function userList_onGetUserList(event:CustomEvent):void
 		{
 			parentApplication.lobby.chatPanel.userEnterLeave(tmpObj.userName, "entered");
 		}
+		
+		if (tmpObj.isHost)
+			AppWide_Singleton.getInstance().setAppInfo("currentHostUserID", tmpObj.userID);
 		
 		userList_DP.addItem(tmpObj);
 		//userList_DP.refresh();
@@ -255,11 +266,13 @@ public function userList_addUser(event:CustomEvent):void
 		tmpObj.isMyVideoOn = parentApplication.lobby.mediaManager.isMyVideoOn;
 		tmpObj.isMyAudioOn = parentApplication.lobby.mediaManager.isMyAudioOn;
 		tmpObj.doNotDock = false;
+		//tmpObj.isHost = false;
 	} else {
 		// else this is another user
 		tmpObj.isViewing = false;
 		tmpObj.isListening = false;
 		tmpObj.doNotDock = false;
+		//tmpObj.isHost = false;
 	}
 	
 	tmpObj.userName = StringUtil.trim(tmpObj.userName);
@@ -277,6 +290,10 @@ public function userList_addUser(event:CustomEvent):void
 	{
 		parentApplication.lobby.chatPanel.userEnterLeave(tmpObj.userName, "entered");
 	}
+	
+	// deprecated by server-side setHost when main host joins
+	//if ((tmpObj.isHost)&&(AppWide_Singleton.getInstance().appInfoObj.currentHostUserID==0))
+	//	AppWide_Singleton.getInstance().setAppInfo("currentHostUserID", tmpObj.userID);
 	
 	// remove the onSync
 	if (tmpObj.isOnSync)
@@ -323,6 +340,11 @@ public function userList_removeUser(event:CustomEvent):void
 			userList_DP[i].isUsersVideoOn = false;
 			userList_DP[i].isUsersAudioOn = false;
 			
+			// TODO if the host is leaving,
+			// reset currentHostUserID to main hosts userID.
+			if (userList_DP[i].isHost)
+				AppWide_Singleton.getInstance().setAppInfo("currentHostUserID", 0);
+			
 			// remove the user from the array which shows who is watching your cam
 			if (parentApplication.lobby.mediaManager.viewedByUserIDs_A.indexOf("user_"+event.eventObj.userID) != -1)
 			{
@@ -339,7 +361,7 @@ public function userList_removeUser(event:CustomEvent):void
 			if (parentApplication.lobby.isUserDocked(userList_DP[i].userID))
 			{
 				//debugMsg("userList_removeUser->  parentApplication.lobby.dockedUserIDs_AC.length: "+parentApplication.lobby.dockedUserIDs_AC.length+"  contains(userList_DP[i]): "+parentApplication.lobby.dockedUserIDs_AC.contains("user_"+userList_DP[i]));
-				parentApplication.lobby.undockCamSpot(userList_DP[i]);
+				parentApplication.lobby.undockCamSpot(userList_DP[i], true);
 			}
 			
 			// if the user joining/leaving is the local user
@@ -531,7 +553,7 @@ public function setIsViewingListening(userID:Number, prop:String, val:Boolean):v
 }
 
 
-public function allStoppedViewingListening(video:Boolean, audio:Boolean):void
+public function allStoppedViewingListening(video:Boolean=true, audio:Boolean=true):void
 {
 	for (var i:int = 0; i < userList_DP.length; ++i) 
 	{
@@ -799,6 +821,48 @@ public function getUserObj(userID:Number):Object
 	}
 	
 	return {};
+}
+
+
+// pass userID or 0 to unset host,
+// or userID to set host
+public function setHost(userID:Number):void
+{
+	for (var i:int = 0; i < userList_DP.length; ++i) 
+	{
+		// TODO
+		// set current hosts isHost = false
+		if ((userID==0)||
+			((userList_DP[i].isHost==true)&&
+			(userList_DP[i].userID!=userID)))
+		{
+			if (userList_DP[i].isHost)
+				debugMsg("setHost->  <HOST UNSET>  userID: "+userList_DP[i].userID+"  userName: "+userList_DP[i].userName);
+			
+			userList_DP[i].isHost = false;
+		}
+		
+		// TODO, REDO/FIX
+		if ((userID!=0)&&
+			(userID==userList_DP[i].userID))
+		{
+			debugMsg("setHost->  <HOST SET>  userID: "+userList_DP[i].userID+"  userName: "+userList_DP[i].userName);
+			userList_DP[i].isHost = true;
+			//break;
+		}/* else if ((userID==0)&&
+					(userList_DP[i].adminType=="rh")) {
+			// set the room hosts isHost = true
+			debugMsg("setHost-> <HOST RESET>  userID: "+userList_DP[i].userID+"  userName: "+userList_DP[i].userName);
+			userList_DP[i].isHost = true;
+		} else if (((userID==0)||(userID==userList_DP[i].userID))&&
+					(userList_DP[i].isHost)) {
+			debugMsg("setHost-> <HOST RESET>  userID: "+userList_DP[i].userID+"  userName: "+userList_DP[i].userName);
+			userList_DP[i].isHost = false;
+		}*/
+	}
+	
+	userList_DP.refresh();
+	userList_DG.invalidateList();
 }
 
 

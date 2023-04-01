@@ -90,7 +90,7 @@ private function onApplicationCompleteHandler(event:Event):void
 	// TODO:
 	// optimize, remove double flashVars check
 	if (__appWideSingleton.flashVars)
-	{/*
+	{
 		if ((__appWideSingleton.flashVars.roomName) &&
 			(__appWideSingleton.flashVars.roomName.length))
 		{
@@ -99,12 +99,12 @@ private function onApplicationCompleteHandler(event:Event):void
 		} else {
 			//Alert.show("roomName does not exist!\n\nflashVars.roomName:\t" + __appWideSingleton.flashVars.roomName+"\n");
 		}
-		*/
+		/**/
 		if ((__appWideSingleton.flashVars.url) &&
 			(__appWideSingleton.flashVars.url.length))
 		{
 			//parentApplication.applicationBar.applicationBar_titleText_L.text = "BongTVLive.com";
-			registerURL_T.htmlText = "<a href='event:https://media.BongTVLive.com/register' target='new'>CREATE/EDIT YOUR ACCOUNT @ https://media.BongTVLive.com/register</a>";
+			registerURL_T.htmlText = "<a href='event:https://www.gigglecams.com/register' target='new'>CREATE/EDIT YOUR ACCOUNT @ https://www.gigglecams.com/register</a>";
 			
 			/*
 			var urlArr:Array = __appWideSingleton.flashVars.url.toString().split("/");
@@ -317,8 +317,8 @@ public function login(userName:String, password:String, roomName:String):void
 	params.defaultQuality = __appWideSingleton.appInfoObj.defaultQuality;
 	params.version = __appWideSingleton.appInfoObj.version;
 	
-	params.previousClientID = "0";
-
+	params.previousClientID = __appWideSingleton.previousClientIDs_A.length ? __appWideSingleton.previousClientIDs_A.pop().toString() : '';
+	
 	if (roomName_TI.text.length)
 		params.roomName = StringUtil.trim(parseOutHTML(roomName));
 	else
@@ -381,14 +381,13 @@ public function connect(_params:Object):void
 	} else {
 		ncURI += "rtmpe";
 	}
-	
-	/*ncURI += "://media.BongTVLive.com"+((__appWideSingleton.appInfoObj.selectedConnectionProtocol=='rtmps' ? ":4430":"") || 
+	//158.69.227.107
+	ncURI += "://media.whohacked.me"+((__appWideSingleton.appInfoObj.selectedConnectionProtocol=='rtmps' ? ":4430":"") || 
 										(__appWideSingleton.appInfoObj.selectedConnectionProtocol=='rtmpt' ? ":81":""))+
-										"/tub2010_server_test/"+_params.roomName.toLowerCase();*/
-	//ncURI += "://192.168.10.104/tub2010_server/"+_params.roomName.toLowerCase();
-	//ncURI += "://192.168.10.125/tub2010_server/"+_params.roomName.toLowerCase();
+										"/tub2010_server/"+_params.roomName.toLowerCase();
+	/*ncURI += "://192.168.10.104/tub2010_server/"+_params.roomName.toLowerCase();*/
 	//ncURI += "://10.0.0.104/tub2010_server/"+_params.roomName.toLowerCase();/**/
-	ncURI += "://media.whohacked.me/tub2010_server/"+_params.roomName.toLowerCase();
+	//ncURI += "://media.whohacked.me/tub2010_server/"+_params.roomName.toLowerCase();
 	
 	// connect to the server (SSL)
 	if (__appWideSingleton.appInfoObj.selectedConnectionProtocol == 'rtmps')

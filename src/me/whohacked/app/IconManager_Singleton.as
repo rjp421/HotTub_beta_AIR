@@ -289,7 +289,7 @@ package me.whohacked.app
 		
 		
 		// static icons
-		[Embed('/assets/volume_full.png')]
+		[Embed('../../../assets/volume_full.png')]
 		private var __app_vumeter_Img:Class;
 		
 		

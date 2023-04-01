@@ -6,15 +6,12 @@ package me.whohacked.app
 	import flash.events.TimerEvent;
 	import flash.media.Camera;
 	import flash.media.Microphone;
-	//import flash.media.Video;
 	import flash.net.Responder;
 	import flash.system.Security;
 	import flash.system.SecurityPanel;
-	//import flash.utils.ByteArray;
 	import flash.utils.Timer;
 	
 	import mx.collections.ArrayCollection;
-	//import mx.graphics.codec.JPEGEncoder;
 	
 	import events.CustomEvent;
 	
@@ -35,11 +32,12 @@ package me.whohacked.app
 		private var __appWideEventDispatcher:AppWideEventDispatcher_Singleton;
 		
 		
-		// version 4, date 11-20-2017, build 02
-		public var version:Number = 41120201702;
+		// version 4, date 03-19-2018, build 01
+		public var version:Number = 40319201801;
 		public var debugMode:Boolean = true;
-		public var statsTimer:Timer;
+		
 		public var flashVars:Object;
+		public var statsTimer:Timer;
 		
 		public var localNetConnection:NetConnectionManager;
 		public var localCamera:Camera;
@@ -61,6 +59,7 @@ package me.whohacked.app
 		public var numVisibleCamSpots:Number;
 		public var numTotalCamSpots:Number;
 		
+		public var previousClientIDs_A:Array;
 		
 		
 		
@@ -156,12 +155,15 @@ package me.whohacked.app
 			appInfoObj.isAutoAdjustForBWEnabled = true;
 			appInfoObj.isRoomHostOnMainChecked = true; // true
 			appInfoObj.isUnmuteRoomHostChecked = true; // false
+			appInfoObj.isShowTimestampsChecked = true; // false
+			appInfoObj.isPrivateMessageInNewWindowChecked = true;
 			appInfoObj.isBanned = false;
 			appInfoObj.fontBold = false;
 			appInfoObj.fontItalics = false;
 			appInfoObj.fontUnderline = false;
 			appInfoObj.fontColor = 000000;
 			appInfoObj.fontSize = 14;
+			appInfoObj.currentHostUserID = 0; // 0 if no host, otherwise hosts userID
 			
 			__appWideEventDispatcher = AppWideEventDispatcher_Singleton.getInstance();
 			__appWideEventDispatcher.addEventListener('onApplicationComplete', onApplicationComplete, false,0,true);
@@ -172,6 +174,8 @@ package me.whohacked.app
 			//__appWideEventDispatcher.addEventListener('takeProfileSnapshot', takeProfileSnapshot, false,0,true);
 			
 			compatibilityInfoObj = {};
+			
+			previousClientIDs_A = [];
 		}
 		
 		
@@ -202,6 +206,7 @@ package me.whohacked.app
 				
 				setAppInfo("isRoomHostOnMainChecked", localSOManager.getLocalSOProperty('isRoomHostOnMainChecked'));
 				setAppInfo("isUnmuteRoomHostChecked", localSOManager.getLocalSOProperty('isUnmuteRoomHostChecked'));
+				setAppInfo("isShowTimestampsChecked", localSOManager.getLocalSOProperty('isShowTimestampsChecked'));
 				
 				setAppInfo("isUseOthersQualityChecked", localSOManager.getLocalSOProperty('isUseOthersQualityChecked'));
 				
@@ -248,9 +253,6 @@ package me.whohacked.app
 				if ((localSOManager.getLocalSOProperty('isAutoAdjustForBWEnabled') != null) &&
 					(localSOManager.getLocalSOProperty('isAutoAdjustForBWEnabled') != undefined))
 					setAppInfo("isAutoAdjustForBWEnabled", localSOManager.getLocalSOProperty('isAutoAdjustForBWEnabled'));
-				
-				//setAppInfo("isAutoReconnectEnabled", localSOManager.getLocalSOProperty('isAutoReconnectEnabled'));
-				//setAppInfo("isAutoAdjustForBWEnabled", localSOManager.getLocalSOProperty('isAutoAdjustForBWEnabled'));
 			}
 			
 			event = null;

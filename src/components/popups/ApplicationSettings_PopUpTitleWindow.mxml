@@ -97,7 +97,9 @@
 				allCamsOff_CB.selected = __appWideSingleton.appInfoObj['isAllCamsOffChecked'];
 				allAudioOff_CB.selected = __appWideSingleton.appInfoObj['isAllAudioOffChecked'];
 				
+				roomHostOnMain_CB.selected = __appWideSingleton.appInfoObj['isRoomHostOnMainChecked'];
 				unmuteRoomHost_CB.selected = __appWideSingleton.appInfoObj['isUnmuteRoomHostChecked'];
+				showTimestamps_CB.selected = __appWideSingleton.appInfoObj['isShowTimestampsChecked'];
 				
 				if (this['selectedCameraInputSize_'+__appWideSingleton.appInfoObj["selectedCameraInputSize"]+'_RB'])
 				{
@@ -171,9 +173,33 @@
 			}
 			
 			
+			private function roomHostOnMain_CB_valueCommitHandler(event:FlexEvent):void
+			{
+				__appWideSingleton.setAppInfo("isRoomHostOnMainChecked", roomHostOnMain_CB.selected);
+				
+				event = null;
+			}
+			
+			
 			private function unmuteRoomHost_CB_valueCommitHandler(event:FlexEvent):void
 			{
 				__appWideSingleton.setAppInfo("isUnmuteRoomHostChecked", unmuteRoomHost_CB.selected);
+				
+				event = null;
+			}
+			
+			
+			private function showTimestamps_CB_valueCommitHandler(event:FlexEvent):void
+			{
+				__appWideSingleton.setAppInfo("isShowTimestampsChecked", showTimestamps_CB.selected);
+				
+				event = null;
+			}
+			
+			
+			private function privateMessageInNewWindow_CB_valueCommitHandler(event:FlexEvent):void
+			{
+				__appWideSingleton.setAppInfo("isPrivateMessageInNewWindowChecked", privateMessageInNewWindow_CB.selected);
 				
 				event = null;
 			}
@@ -436,14 +462,26 @@
 				
 				<s:Spacer height="20"/>
 				
+				<s:CheckBox id="roomHostOnMain_CB"
+							label="Auto-dock the room host to main cam" 
+							toolTip="Auto-dock the room host to the main (large) cam spot"
+							valueCommit="roomHostOnMain_CB_valueCommitHandler(event)"/>
+				
 				<s:CheckBox id="unmuteRoomHost_CB"
 							label="Auto-unmute the room hosts audio" 
 							valueCommit="unmuteRoomHost_CB_valueCommitHandler(event)"/>
 				<!--
-				<s:CheckBox id="showCamSpotStats_CB"
-							label="" 
-							valueCommit="showCamSpotStats_CB_valueCommitHandler(event)"/>
 				-->
+				<s:CheckBox id="showTimestamps_CB"
+							label="Show timestamps in chat" 
+							valueCommit="showTimestamps_CB_valueCommitHandler(event)"/>
+				
+				<s:Spacer height="20"/>
+				
+				<s:CheckBox id="privateMessageInNewWindow_CB"
+							label="Show PM's in a new window" 
+							valueCommit="privateMessageInNewWindow_CB_valueCommitHandler(event)"/>
+				
 			</s:VGroup>
 			
 		</s:VGroup>

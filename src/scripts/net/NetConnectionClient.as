@@ -139,6 +139,18 @@ package scripts.net
 		}
 		
 		
+		public function showAdminMessage(msgObj:Object):void
+		{
+			var tmpObj:Object = msgObj;
+			
+			//debugMsg("showAdminMessage->  msgObj: "+tmpObj+"  msg: "+tmpObj.msg);
+			dispatchEvent(new CustomEvent("showAdminMessage", false, false, tmpObj));
+			
+			tmpObj = null;
+			msgObj = null;
+		}
+		
+		
 		public function receivePrivateMessage(msgObj:Object):void
 		{
 			var _msgObj:Object = msgObj;
@@ -176,15 +188,10 @@ package scripts.net
 		}
 		*/
 		
-		public function showAdminMessage(msgObj:Object):void
+		
+		public function setHost(userID:Number):void
 		{
-			var tmpObj:Object = msgObj;
-			
-			//debugMsg("showAdminMessage->  msgObj: "+tmpObj+"  msg: "+tmpObj.msg);
-			dispatchEvent(new CustomEvent("showAdminMessage", false, false, tmpObj));
-			
-			tmpObj = null;
-			msgObj = null;
+			AppWideEventDispatcher_Singleton.getInstance().dispatchEvent(new CustomEvent("setHost", false, false, {userID:userID}));
 		}
 		
 		

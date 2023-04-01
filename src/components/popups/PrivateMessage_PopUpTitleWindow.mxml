@@ -89,6 +89,9 @@
 				this.titleDisplay.setStyle("fontType", "bold");
 				this.titleDisplay.setStyle("fontFamily", "Verdana");*/
 				pmText_TA.setStyle("fontType", "normal");
+				
+				this.alpha = 0.8;
+				
 				if (!pmText_TI.hasEventListener("FlexEvent.ENTER")){
 					pmText_TI.addEventListener(FlexEvent.ENTER,sendMessageOnEnter);
 				}
@@ -152,6 +155,7 @@
 				if (!msgObj.toUserID)
 				{
 					// this is a new PM
+					//msgObj.clientID = parentApplication.lobby.mediaManager.clientID;
 					msgObj.fromUserID = cmdObj.fromUserID;
 					msgObj.fromUserName = cmdObj.fromUserName;
 					msgObj.toUserID = cmdObj.toUserID;
@@ -160,7 +164,7 @@
 				
 				msgObj.msg = pmText_TI.text;
 				
-				parentApplication.loginPanel.nc.call("chatManager.sendPrivateMessage", null, parentApplication.lobby.mediaManager.userID, msgObj);
+				parentApplication.loginPanel.nc.call("chatManager.sendPrivateMessage", null, parentApplication.lobby.mediaManager.clientID, msgObj);
 				
 				pmText_TA.htmlText += "<font size='12' color='#000000' face='Verdana'><b>"+parentApplication.lobby.mediaManager.userName+"</b>:  "+ pmText_TI.text +"</font>"+"\n";
 				if (pmText_TA.mx_internal::getTextField().numLines >= 30)
@@ -182,18 +186,23 @@
 				{
 					// this is a NEW received PM!
 					this.title = "Private Message "+eventObj.fromUserName;
+					
 					if (eventObj.fromUserID == parentApplication.lobby.mediaManager.userID)
 					{
 						this.id = "pm_"+eventObj.toUserID;
 					} else {
 						this.id = "pm_"+eventObj.fromUserID;
 					}
+					
 					trace("NEW PM RECEIVED!>>  this.id: "+this.id);
-					msgObj.fromUserID = eventObj.fromUserID;
-					msgObj.fromUserName = eventObj.fromUserName;
-					msgObj.toUserID = eventObj.toUserID;
-					msgObj.toUserName = eventObj.toUserName;
+					
+					// TEMP
+					msgObj.fromUserID = eventObj.toUserID;
+					msgObj.fromUserName = eventObj.toUserName;
+					msgObj.toUserID = eventObj.fromUserID;
+					msgObj.toUserName = eventObj.fromUserName;
 				}
+				
 				if (!parentApplication.lobby.isUserIgnored(parentApplication.lobby.userListPanel.getUserObj(eventObj.fromUserID).acctID, eventObj.fromUserName))
 				{
 					pmText_TA.htmlText += "<font size='12' color='#000000' face='Verdana'><b>"+parentApplication.lobby.userListPanel.getUserObj(eventObj.userID).userName+"</b>:  "+ eventObj.msg +"</font>"+"\n";
@@ -205,6 +214,7 @@
 					pmText_TA.validateNow();
 					pmText_TA.verticalScrollPosition = pmText_TA.maxVerticalScrollPosition;
 				}
+				
 				trace("PM RECEIVED!>>  this.id: "+this.id);
 				eventObj = null;
 			}
@@ -265,7 +275,7 @@
 				x="0" y="0"
 				width="444" height="25" 
 				textAlign="left" contentBackgroundAlpha="0.7"
-				contentBackgroundColor="#FFFFFF" focusThickness="1"/>
+				focusThickness="1"/>
 			
 			<s:Button id="sendMsgBtn"
 				width="111" height="25"

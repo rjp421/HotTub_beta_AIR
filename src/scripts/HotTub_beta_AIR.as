@@ -34,6 +34,7 @@ public var flashVars:Object;
 
 private function preinitializeHandler(event:FlexEvent):void
 {
+	// not used with AIR
 	//Security.allowDomain("*");
 	
 	__appWideSingleton = AppWide_Singleton.getInstance();
@@ -69,7 +70,7 @@ private function applicationCompleteHandler(event:FlexEvent):void
 	debugMsg("applicationCompleteHandler->  Application Complete!\tSWF version "+loaderInfo.swfVersion+"  browserMeasuredWidth: "+screen.width+"  browserMeasuredHeight: "+screen.height+"  stageWidth: "+stage.stageWidth+"  stageHeight: "+stage.stageHeight+"  stage.width: "+stage.width+"  stage.height: "+stage.height+"  width: "+this.width+"  height: "+this.height);
 	
 	// variables from the URL that loads this .swf
-	__appWideSingleton.flashVars = {};// loaderInfo.parameters;
+	__appWideSingleton.flashVars = loaderInfo.parameters;
 	flashVars = __appWideSingleton.flashVars;
 	for (var i:String in flashVars) { debugMsg("flashVars.i: "+i+"  flashVars.info[i]: "+flashVars[i]); } i = null;
 	
@@ -85,7 +86,14 @@ private function applicationCompleteHandler(event:FlexEvent):void
 	
 	// listen for changes made by the LayoutManager singleton
 	__appWideEventDispatcher.addEventListener("onLayoutChanged", onLayoutChanged, false,0,true);
-	
+	/*
+	if ((flashVars.roomName != null) && 
+		(flashVars.roomName != undefined) && 
+		(flashVars.roomName.toString()))
+	{
+		parentApplication.lobby.loginPanel.roomName_TI.text = flashVars.roomName;
+	}
+	*/
 	if ((flashVars.isPopout != null) && 
 		(flashVars.isPopout != undefined) && 
 		(flashVars.isPopout.toString() == "true"))
@@ -121,6 +129,10 @@ private function createLobby(event:CustomEvent):void
 	__appWideSingleton.userInfoObj.userName = event.cloneCustomEvent().eventObj.userName;
 	// the rest of the local clients info is added to __appWideSingleton.userInfoObj
 	// after the UserList is initialised
+	
+	// TODO
+	// save the clientID to send it upon reconnection
+	__appWideSingleton.previousClientIDs_A.push(__appWideSingleton.userInfoObj.clientID);
 	
 	// change the state to chatState
 	this.currentState = "chatState";

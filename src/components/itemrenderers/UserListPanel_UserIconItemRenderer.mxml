@@ -84,14 +84,16 @@
 					return;
 				}
 				
-				if (data.acctID == 0)
-					userIconImg.source = __iconManager.getIcon('app_userList_guest');
+				if (data.isHost==true)
+					userIconImg.source = __iconManager.getIcon('app_userList_rh');
 				else if ((data.adminType == 'rm') || 
 						(data.adminType == 'ra') || 
 						(data.adminType == 'rh') || 
 						(data.adminType == 'ga') || 
 						(data.adminType == 'sa'))
 					userIconImg.source = __iconManager.getIcon('app_userList_'+data.adminType);
+				else if (data.acctID == 0)
+					userIconImg.source = __iconManager.getIcon('app_userList_guest');
 				else
 					userIconImg.source = __iconManager.getIcon('app_userList_member');
 				/*

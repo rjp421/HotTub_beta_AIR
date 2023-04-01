@@ -128,6 +128,7 @@
 				}
 				
 				applicationBar_blockList_Btn.enabled = false;
+				applicationBar_host_Btn.enabled = false;
 				bwChart.doBWCheck_Btn.enabled = false;
 				
 				__iconManager = null;
@@ -144,6 +145,7 @@
 			private function onAppConnected():void
 			{
 				applicationBar_blockList_Btn.enabled = true;
+				applicationBar_host_Btn.enabled = true; // FIX
 				bwChart.doBWCheck_Btn.enabled = true;
 			}
 			
@@ -160,6 +162,7 @@
 			private function debugMsg(str:String):void
 			{
 				AppWideDebug_Singleton.getInstance().newDebugMessage(this.id, str);
+				str = null;
 			}
 			
 			
@@ -195,6 +198,12 @@
 				  horizontalAlign="center"
 				  verticalAlign="middle">
 			
+			<s:Button id="logoutBtn"
+					  width="100" height="90%"
+					  label="Logout" right="0" 
+					  icon="{__iconManager.getIcon('app_door_out')}"
+					  click="parentApplication.loginPanel.disconnect()"/>
+			
 			<s:Button id="applicationBar_appSettings_Btn" 
 					  width="100" height="90%"
 					  label="Settings" icon="{__iconManager.getIcon('app_settings')}"
@@ -209,6 +218,12 @@
 			<s:Button id="applicationBar_blockList_Btn" 
 					  width="100" height="90%"
 					  label="Block List" 
+					  click="applicationBar_blockList_Btn_clickHandler(event)"
+					  enabled="false"/>
+			
+			<s:Button id="applicationBar_host_Btn" 
+					  width="100" height="90%"
+					  label="Host" 
 					  click="applicationBar_blockList_Btn_clickHandler(event)"
 					  enabled="false"/>
 			
@@ -271,7 +286,7 @@
 			<s:Label id="applicationBar_titleText_L" 
 					 textAlign="center" maxDisplayedLines="1"
 					 verticalAlign="middle"
-					 text="Hot Tub"
+					 text=""
 					 fontSize="24"/>
 			
 		</s:HGroup>

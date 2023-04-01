@@ -204,6 +204,7 @@ package me.whohacked.app
 			
 			setLocalSOProperty('isRoomHostOnMainChecked',true);
 			setLocalSOProperty('isUnmuteRoomHostChecked',true);
+			setLocalSOProperty('isShowTimestampsChecked',true);
 			
 			setLocalSOProperty('selectedConnectionProtocol','rtmp');
 			setLocalSOProperty('selectedLayout','medium');
