@@ -2,15 +2,15 @@
 <!--
 BongTVLive.com Hot Tub 2.0 beta7 by b0nghitter
 -->
-<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
-			   xmlns:s="library://ns.adobe.com/flex/spark"
-			   xmlns:mx="library://ns.adobe.com/flex/mx"
-			   xmlns:components="components.*"
-			   width="1165" height="685" 
-			   preinitialize="preinitializeHandler(event)"
-			   initialize="initializeHandler(event)" 
-			   applicationComplete="applicationCompleteHandler(event)"
-			   preloaderChromeColor="#006600">
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009"
+						xmlns:s="library://ns.adobe.com/flex/spark"
+						xmlns:mx="library://ns.adobe.com/flex/mx"
+						xmlns:components="components.*"
+						width="1165" height="685" 
+						preinitialize="preinitializeHandler(event)"
+						initialize="initializeHandler(event)" 
+						applicationComplete="applicationCompleteHandler(event)"
+						preloaderChromeColor="#006600">
 	
 	
 	
@@ -108,4 +108,4 @@ BongTVLive.com Hot Tub 2.0 beta7 by b0nghitter
 	
 	
 	
-</s:Application>
+</s:WindowedApplication>
