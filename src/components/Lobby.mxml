@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 xmlns:components="components.*" 
+		 xmlns:chat="components.chat.*"
+		 preinitialize="preinitializeHandler(event)"
+		 creationComplete="lobbyCreationCompleteHandler(event)">
+	
+	
+	
+	<!-- STATES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	
+	<!--	
+	<s:states>
+	</s:states>
+	-->	
+	
+	
+	<!-- METADATA ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	
+	
+	<!-- SCRIPTS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	
+	<fx:Script source="..\\scripts\\Lobby.as"/>
+	
+	
+	
+	<!-- DECLARATIONS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (services, value objects, etc) here -->
+	</fx:Declarations>
+	
+	
+	
+	
+	<!-- UI COMPONENTS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	
+	
+	<!--the ChatPanel in the middle-->
+	<chat:ChatPanel id="chatPanel"
+					x="170" y="130" 
+					width="655" height="370"/>
+	
+	<!--the UserList-->
+	<components:UserListPanel id="userListPanel"
+							  x="830" y="255"
+							  width="160" height="245"/>
+	
+	<!--CamSpots around the edges-->
+	<components:CamSpot id="camSpot1"
+						x="5" y="5" 
+						width="160" height="120"/>
+	
+	<components:CamSpot id="camSpot2"
+						x="170" y="5" 
+						width="160" height="120"/>
+	
+	<components:CamSpot id="camSpot3"
+						x="335" y="5" 
+						width="160" height="120"/>
+	
+	<components:CamSpot id="camSpot4"
+						x="500" y="5" 
+						width="160" height="120"/>
+	
+	<components:CamSpot id="camSpot5"
+						x="665" y="5" 
+						width="160" height="120"/>
+	
+	<components:CamSpot id="camSpot6"
+						x="835" y="5" 
+						width="320" height="240"/>
+	
+	<components:CamSpot id="camSpot7"
+						x="5" y="130" 
+						width="160" height="120"/>
+	
+	<components:CamSpot id="camSpot8"
+						x="5" y="255" 
+						width="160" height="120"/>
+	
+	<components:CamSpot id="camSpot9"
+						x="995" y="255" 
+						width="160" height="120"/>
+	
+	<components:CamSpot id="camSpot10"
+						x="5" y="380" 
+						width="160" height="120"/>
+	
+	<components:CamSpot id="camSpot11"
+						x="995" y="380" 
+						width="160" height="120"/>
+	
+	<components:CamSpot id="camSpot12"
+						x="5" y="505" 
+						width="160" height="120"/>
+	
+	<components:CamSpot id="camSpot13"
+						x="170" y="505" 
+						width="160" height="120"/>
+	
+	<components:CamSpot id="camSpot14"
+						x="335" y="505" 
+						width="160" height="120"/>
+	
+	<components:CamSpot id="camSpot15"
+						x="500" y="505" 
+						width="160" height="120"/>
+	
+	<components:CamSpot id="camSpot16"
+						x="665" y="505" 
+						width="160" height="120"/>
+	
+	<components:CamSpot id="camSpot17"
+						x="830" y="505" 
+						width="160" height="120"/>
+	
+	<components:CamSpot id="camSpot18"
+						x="995" y="505" 
+						width="160" height="120"/>
+	
+	
+	
+</s:Group>

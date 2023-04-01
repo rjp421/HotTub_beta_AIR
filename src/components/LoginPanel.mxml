@@ -1,0 +1,512 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark"
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 initialize="loginPanel_initializeHandler(event)"
+		 creationComplete="loginPanel_creationCompleteHandler(event)">
+	
+	
+	<!-- STATES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	<!--	
+	<s:states>
+	</s:states>
+	-->
+	
+	
+	<!-- METADATA ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	
+	
+	<!-- SCRIPTS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	
+	<fx:Script source="../scripts/LoginPanel.as"/>
+	
+	
+	<!-- DECLARATIONS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	
+	
+	<!-- STYLES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	
+	
+	<!-- LAYOUTS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	
+	<s:layout>
+		<s:BasicLayout/>
+	</s:layout>
+	
+	
+	
+	<!-- UI COMPONENTS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	
+	
+	<!-- background rect in the back (on the bottom layer) -->
+	<s:Rect left="0" right="0" top="0" bottom="0" radiusX="14" radiusY="14">
+		<s:fill>
+			<s:SolidColor color="0x393939"/>
+		</s:fill>
+	</s:Rect>
+	
+	
+	
+	<!-- components in front -->
+	<s:VGroup left="0" right="0" 
+			  top="0" bottom="0" 
+			  horizontalAlign="center" 
+			  verticalAlign="middle"
+			  gap="2">
+		
+		
+		<s:Spacer height="10"/>
+		
+		
+		<mx:Text width="100%"
+				 condenseWhite="true"
+				 selectable="false">
+			<mx:htmlText>
+				<![CDATA[
+					<b>
+						<font color='#FFFF00' size='20'>WARNING:</font><br /><br />
+						<font size='16' color='#FF0000'>You must be <font color='#FFFF00'>18+</font> to enter.</font><br />
+						<font size='10' color='#FFFF00'>By clicking login, you are agreeing to these terms.</font>
+					</b>
+				]]>
+			</mx:htmlText>
+		</mx:Text>
+		
+		
+		<s:Spacer height="10"/>
+		
+		
+		<s:Label width="80%" paddingTop="5"
+				 text="Login:"/>
+		
+		<s:TextInput id="userName_TI" 
+					 width="260" maxChars="42" 
+					 restrict="A-Z a-z 0-9 \u0020-\u007E" 
+					 prompt="E-mail, or account/user/guest name" 
+					 toolTip="Enter your e-mail, or account/user/guest name. 42 chars max!" 
+					 enter="loginBtn_clickHandler(event)"/>
+		
+		
+		<s:Label width="80%" paddingTop="5"
+				 text="Password:"/>
+		
+		<s:TextInput id="password_TI" 
+					 width="260" maxChars="128" 
+					 displayAsPassword="true"
+					 prompt="OPTIONAL" 
+					 toolTip="The password for your account, or leave it blank to enter as a guest. 128 chars max!" 
+					 enter="loginBtn_clickHandler(event)"/>
+		
+		
+		<s:Label width="80%" paddingTop="5"
+				 visible="false" includeInLayout="false"
+				 text="Room:"/>
+		
+		<s:TextInput id="roomName_TI" 
+					 width="260" maxChars="42" 
+					 visible="false" includeInLayout="false"
+					 restrict="A-Z a-z 0-9 \u0020-\u007E" 
+					 prompt="lobby (default)" 
+					 toolTip="The name of the room, or leave it blank to enter the lobby. 42 chars max!" 
+					 enter="loginBtn_clickHandler(event)"/>
+		
+		
+		<s:Spacer height="15"/>
+		
+		
+		<s:Label width="80%"
+				 text="Quality:"/>
+		
+		
+		<s:HGroup width="100%"
+				  paddingTop="5"
+				  horizontalAlign="center" 
+				  verticalAlign="middle"
+				  gap="60">
+			
+			<s:VGroup horizontalAlign="center" 
+					  verticalAlign="middle"
+					  toolTip="1 FPS">
+				
+				<s:Label fontSize="12"
+						 text="Low"/>
+				
+				<s:RadioButton id="lowQuality_RB"
+							   click="quality_RB_clickHandler('low')"/>
+				
+			</s:VGroup>
+			
+			<s:VGroup horizontalAlign="center" 
+					  verticalAlign="middle"
+					  toolTip="3 FPS">
+				
+				<s:Label fontSize="12"
+						 text="Medium"/>
+				
+				<s:RadioButton id="mediumQuality_RB"
+							   click="quality_RB_clickHandler('medium')"/>
+				
+			</s:VGroup>
+			
+			<s:VGroup horizontalAlign="center" 
+					  verticalAlign="middle"
+					  toolTip="6 FPS">
+				
+				<s:Label fontSize="12"
+						 text="High"/>
+				
+				<s:RadioButton id="highQuality_RB"
+							   click="quality_RB_clickHandler('high')"/>
+				
+			</s:VGroup>
+			
+			<s:VGroup horizontalAlign="center" 
+					  verticalAlign="middle"
+					  toolTip="8 FPS">
+				
+				<s:Label fontSize="12"
+						 text="HD"/>
+				
+				<s:RadioButton id="hdQuality_RB"
+							   click="quality_RB_clickHandler('hd')"/>
+				
+			</s:VGroup>
+			
+			
+		</s:HGroup>
+		
+		
+		<s:Spacer height="5"/>
+		
+		
+		<s:HGroup width="100%"
+				  horizontalAlign="center" 
+				  verticalAlign="middle">
+			
+			<s:HGroup horizontalAlign="center" 
+					  verticalAlign="middle">
+				
+				<s:Label width="140" height="100%" 
+						 fontSize="12" verticalAlign="middle" 
+						 text="Save password:"
+						 toolTip="Save your password"/>
+				
+				<s:CheckBox id="savePassword_CB"
+							toolTip="Save your password"/>
+							<!--layoutDirection="rtl"
+							label="Save password:"-->
+			</s:HGroup>
+			
+			<s:HGroup horizontalAlign="center" 
+					  verticalAlign="middle">
+				<s:Label width="140" height="100%" 
+						 fontSize="12" verticalAlign="middle" 
+						 text="Auto-fill cam spots:"
+						 toolTip="Fill all of the cams automatically when you enter the chat, and when a user turns on their cam"/>
+				
+				<s:CheckBox id="autoFillCamsOnJoin_CB"
+							toolTip="Fill all of the cams automatically when you enter the chat, and when a user turns on their cam"/>
+			</s:HGroup>
+			
+		</s:HGroup>
+		
+		
+		<s:HGroup width="100%"
+				  horizontalAlign="center" 
+				  verticalAlign="middle">
+			
+			<s:HGroup horizontalAlign="center" 
+					  verticalAlign="middle">
+				<s:Label width="140" height="100%" 
+						 fontSize="12" verticalAlign="middle" 
+						 text="ALL CAMS OFF:"
+						 toolTip="Turn off a cams video by default"/>
+				
+				<s:CheckBox id="allVideoOffOnJoin_CB"
+							toolTip="Turn off a cams video by default"/>
+			</s:HGroup>
+			
+			<s:HGroup horizontalAlign="center" 
+					  verticalAlign="middle">
+				<s:Label width="140" height="100%" 
+						 fontSize="12" verticalAlign="middle" 
+						 text="ALL AUDIO OFF:"
+						 toolTip="Turn off a cams audio by default"/>
+				
+				<s:CheckBox id="allAudioOffOnJoin_CB"
+							toolTip="Turn off a cams audio by default"/>
+			</s:HGroup>
+			
+		</s:HGroup>
+		
+		
+		<s:HGroup width="100%"
+				  horizontalAlign="center" 
+				  verticalAlign="middle">
+			
+			<s:HGroup horizontalAlign="center" 
+					  verticalAlign="middle">
+				<s:Label width="140" height="100%" 
+						 fontSize="12" verticalAlign="middle" 
+						 text="Use others quality:"
+						 toolTip="Play others video at their chosen quality"/>
+				
+				<s:CheckBox id="useOthersQuality_CB"
+							toolTip="Play others video at their chosen quality"/>
+			</s:HGroup>
+			
+			<s:HGroup horizontalAlign="center" 
+					  verticalAlign="middle"
+					  enabled="false">
+				<s:Label width="140" height="100%" 
+						 fontSize="12" verticalAlign="middle" 
+						 text="Enable voice chat:"
+						 toolTip="Enable the push-to-talk style voice chat (experimental)"/>
+				
+				<s:CheckBox id="voiceChatEnabled_CB"
+							toolTip="Enable the push-to-talk style voice chat (experimental)"/>
+			</s:HGroup>
+			
+		</s:HGroup>
+		
+		
+		<s:Spacer height="10"/>
+		
+		
+		<s:VGroup horizontalAlign="center" 
+				  verticalAlign="middle"
+				  gap="0">
+			
+			<s:BitmapImage id="newIcon_Img"
+						   width="20" height="20"
+						   source="{__iconManager.getIcon('app_new')}"/>
+			
+			<s:HGroup horizontalAlign="center" 
+					  verticalAlign="middle">
+				
+				<s:HGroup horizontalAlign="center" 
+						  verticalAlign="middle">
+					<s:Label width="140" height="100%" 
+							 fontSize="12" verticalAlign="middle" 
+							 text="Room host on main:"
+							 toolTip="Auto-dock the room host to the main (large) cam spot"/>
+					
+					<s:CheckBox id="roomHostOnMain_CB"
+								toolTip="Auto-dock the room host to the main (large) cam spot"/>
+				</s:HGroup>
+				
+				<s:HGroup horizontalAlign="center" 
+						  verticalAlign="middle">
+					<s:Label width="140" height="100%" 
+							 fontSize="12" verticalAlign="middle" 
+							 text="Unmute room host:"
+							 toolTip="Auto-unmute the room hosts audio"/>
+					
+					<s:CheckBox id="roomHostAutoUnmute_CB"
+								toolTip="Auto-unmute the room hosts audio"/>
+				</s:HGroup>
+				
+			</s:HGroup>
+			
+			
+			
+			<s:Spacer height="15"/>
+			
+			
+			<!--
+					  enabled="false"
+					  visible="false"
+					  includeInLayout="false"
+			-->
+			<s:HGroup horizontalAlign="center" 
+					  verticalAlign="middle"
+					  gap="35">
+				
+				<s:VGroup horizontalAlign="center" 
+						  verticalAlign="middle"
+						  gap="2">
+					<s:Label width="100%"
+							 text="Your video codec:" 
+							 textAlign="center"
+							 fontSize="12"/>
+					<s:HGroup horizontalAlign="center" 
+							  verticalAlign="middle"
+							  gap="20">
+						<s:RadioButton id="selectedVideoCodec_SORENSON_RB"
+									   group="{selectedVideoCodec_RBG}"
+									   label="Sorenson Spark" value="Sorenson" 
+									   layoutDirection="rtl" height="100%" 
+									   fontSize="11" selected="true" 
+									   toolTip="Use the default Sorenson Spark video codec to stream video to the server, recommended."/>
+						<s:RadioButton id="selectedVideoCodec_H264_RB"
+									   group="{selectedVideoCodec_RBG}"
+									   label="AVC H.264" value="H264" 
+									   layoutDirection="rtl" height="100%" 
+									   fontSize="11" 
+									   toolTip="Use the new H.264 video codec to stream video to the server, EXPERIMENTAL!"/>
+					</s:HGroup>
+				</s:VGroup>
+				
+				<s:VGroup horizontalAlign="center" 
+						  verticalAlign="middle"
+						  gap="2">
+					<s:Label width="100%"
+							 text="Your audio codec:" 
+							 textAlign="center"
+							 fontSize="12"/>
+					<s:HGroup horizontalAlign="center" 
+							  verticalAlign="middle"
+							  gap="20">
+						<s:RadioButton id="selectedAudioCodec_NELLYMOSER_RB"
+									   group="{selectedAudioCodec_RBG}"
+									   label="Nellymoser" value="Nellymoser" 
+									   layoutDirection="rtl" height="100%" 
+									   fontSize="11" selected="true" 
+									   toolTip="Use the default Nellymoser audio codec to stream audio to the server, recommended."/>
+						<s:RadioButton id="selectedAudioCodec_SPEEX_RB"
+									   group="{selectedAudioCodec_RBG}"
+									   label="Speex" value="Speex" 
+									   layoutDirection="rtl" height="100%" 
+									   fontSize="11" 
+									   toolTip="Use the new Speex audio codec to stream audio to the server, EXPERIMENTAL!"/>
+					</s:HGroup>
+				</s:VGroup>
+				
+			</s:HGroup>
+			
+			
+			<s:Spacer height="15"/>
+			
+			
+			<s:VGroup horizontalAlign="center" 
+					  verticalAlign="middle"
+					  gap="2">
+				<s:Label width="100%"
+						 text="Connection Protocol:" 
+						 textAlign="center"
+						 fontSize="12"/>
+				<s:HGroup horizontalAlign="center" 
+						  verticalAlign="middle"
+						  gap="30">
+					<s:RadioButton id="selectedConnectionProtocol_RTMP_RB"
+								   group="{selectedConnectionProtocol_RBG}"
+								   label="RTMPE" value="RTMP" 
+								   layoutDirection="rtl" height="100%" 
+								   fontSize="11" 
+								   toolTip="Use the encrypted RTMPE (TCP port 1935) protocol, recommended."/>
+					<s:RadioButton id="selectedConnectionProtocol_RTMPS_RB"
+								   group="{selectedConnectionProtocol_RBG}"
+								   label="RTMPS" value="RTMPS" 
+								   layoutDirection="rtl" height="100%"  
+								   fontSize="11" 
+								   toolTip="Use the RTMPS (TCP port 443 (4430) using SSL/TLS encryption) protocol, EXPERIMENTAL!"/>
+					<s:RadioButton id="selectedConnectionProtocol_RTMPT_RB"
+								   group="{selectedConnectionProtocol_RBG}"
+								   label="RTMPTE" value="RTMPT" 
+								   layoutDirection="rtl" height="100%" 
+								   fontSize="11" 
+								   toolTip="Use the encrypted RTMPTE (TCP port 80 (81) HTTP) protocol, EXPERIMENTAL!"/>
+					<s:RadioButton id="selectedConnectionProtocol_RTMFP_RB"
+								   group="{selectedConnectionProtocol_RBG}"
+								   label="RTMFP" value="RTMFP" 
+								   layoutDirection="rtl" height="100%" 
+								   fontSize="11" 
+								   toolTip="Use the encrypted RTMFP (UDP ports 1935,19350-65535) protocol. May help reduce lag and other connection issues, EXPERIMENTAL!"/>
+				</s:HGroup>
+			</s:VGroup>
+			
+				
+		</s:VGroup>
+		
+		
+		
+		<s:Spacer height="10"/>
+		
+		
+		<s:Button id="loginBtn"
+				  label="Login"
+				  fontSize="18" 
+				  width="140" height="30"
+				  click="loginBtn_clickHandler(event)"/>
+		
+		
+		<s:Spacer height="5"/>
+		
+		
+		<s:Label id="loginStatusInfo_T" 
+				 width="100%" 
+				 color="#FFFF00" 
+				 fontSize="12" 
+				 fontWeight="normal"/>
+		
+		
+		<s:Spacer height="10"/>
+		
+		
+		<mx:Text id="registerURL_T" width="80%"
+				 selectable="true" visible="false"
+				 condenseWhite="true"
+				 link="registerURL_linkHandler(event)">
+			<mx:htmlText>
+				<![CDATA[
+					<a href='event:https://media.BongTVLive.com/register' target='_blank'>CREATE/EDIT YOUR ACCOUNT @ https://media.BongTVLive.com/register</a>
+				]]>
+			</mx:htmlText>
+		</mx:Text>
+		
+		
+		
+		<!--
+		<mx:Text width="80%" height="80"
+				 condenseWhite="true" 
+				 selectable="false">
+			<mx:htmlText>
+				<![CDATA[
+				<font size='12' color='#FFFF00'><b>Use <font color='#00FF00'>ALL CAMS/AUDIO OFF</font> if you have slow internet. The Hot Tub has 18 high quality cams and may use a lot of bandwidth!<br><font color='#FFFFFF' size='10'>YOU MIGHT LAG IF YOU'RE WATCHING TOO MANY CAMS AT ONCE AND YOUR INTERNET CANT HANDLE IT!</font></b></font>
+				]]>
+			</mx:htmlText>
+		</mx:Text>
+		
+		<mx:Text width="80%" height="40"
+				 condenseWhite="true" 
+				 selectable="false">
+			<mx:htmlText>
+				<![CDATA[
+				<font size='12' color='#FFFF00'><b>IS CHAT NOT WORKING??? CLICK BELOW TO CLEAR YOUR SETTINGS, AND THEN REFRESH THE PAGE!!</b></font>
+				]]>
+			</mx:htmlText>
+		</mx:Text>
+		
+		<s:Button id="clearSOBtn"
+				  label="Clear Settings"
+				  click="clearSOBtn_clickHandler(event)"/>
+		-->
+		
+		
+		<s:Spacer height="5"/>
+		
+		
+		<s:Label id="versionInfo_L" 
+				 width="100%" bottom="0" 
+				 color="#FFFF00" 
+				 fontSize="10" 
+				 fontWeight="normal"/>
+		
+		
+	</s:VGroup>
+	
+	
+	
+	<fx:Declarations>
+		<s:RadioButtonGroup id="selectedVideoCodec_RBG" 
+							change="selectedVideoCodec_RBG_changeHandler(event)"/>
+		<s:RadioButtonGroup id="selectedAudioCodec_RBG" 
+							change="selectedAudioCodec_RBG_changeHandler(event)"/>
+		<s:RadioButtonGroup id="selectedConnectionProtocol_RBG" 
+							change="selectedConnectionProtocol_RBG_changeHandler(event)"/>
+	</fx:Declarations>
+	
+	
+	
+	
+</s:Group>

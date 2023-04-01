@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:HGroup xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		  xmlns:s="library://ns.adobe.com/flex/spark" 
+		  xmlns:mx="library://ns.adobe.com/flex/mx"
+		  width="100%" height="100%" 
+		  gap="2" verticalAlign="middle">
+	
+	
+	
+	<!-- STATES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<!--	
+	<s:states>
+	</s:states>
+-->	
+	
+	<!-- METADATA ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	
+	
+	<!-- SCRIPTS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	
+	
+	<!-- DECLARATIONS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (services, value objects, etc) here -->
+	</fx:Declarations>
+	
+	
+	
+	<!-- UI COMPONENTS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	
+	
+	
+	<s:TextInput id="chatTextInput_TI" 
+				 width="100%" height="100%" 
+				 color="#000000" fontSize="14" 
+				 contentBackgroundColor="#EEEEEE" 
+				 contentBackgroundAlpha="0.7" 
+				 textAlign="left" focusThickness="1"/>
+	
+	
+	<s:Button id="sendMsgBtn"
+			  width="70" height="100%" 
+			  label="Send"/>
+	
+	
+</s:HGroup>

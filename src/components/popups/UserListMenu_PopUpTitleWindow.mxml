@@ -1,0 +1,424 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" 
+			   preinitialize="preinitializeHandler(event)" 
+			   initialize="initializeHandler(event)" 
+			   creationComplete="creationCompleteHandler(event)" 
+			   close="handleCloseEvent()" 
+			   mouseDownOutside="handleCloseEvent()"
+			   windowMoving="titleWin_windowMovingHandler(event)">
+	
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	
+	<s:layout>
+		<s:VerticalLayout/>
+	</s:layout>
+	
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import mx.events.FlexEvent;
+			import mx.events.ListEvent;
+			import mx.managers.PopUpManager;
+			
+			import spark.events.TitleWindowBoundsEvent;
+			
+			//import events.CustomEvent;
+			
+			import me.whohacked.app.AppWide_Singleton;
+			
+			private var userListMenu_DP:ArrayCollection;
+			private var cmdObj:Object;
+			private var localUserID:String;
+			private var selectedUserObj:Object;
+			
+			
+			
+			protected function preinitializeHandler(event:FlexEvent):void
+			{
+				
+				event = null;
+			}
+			
+			
+			protected function initializeHandler(event:FlexEvent):void
+			{
+				// close any previous menu
+				if (parentApplication.lobby.userListPanel.popUpMenu)
+				{
+					PopUpManager.removePopUp(parentApplication.lobby.userListPanel.popUpMenu);
+					parentApplication.lobby.userListPanel.popUpMenu = null;
+					parentApplication.lobby.userListPanel.userCmdObj = null;
+				}
+				
+				localUserID = parentApplication.lobby.mediaManager.userID;
+				selectedUserObj = (parentApplication.lobby.userListPanel.userList_DG.selectedItem ? parentApplication.lobby.userListPanel.userList_DG.selectedItem : null);
+				
+				event = null;
+			}
+			
+			
+			protected function creationCompleteHandler(event:FlexEvent):void
+			{
+				// set the title bar text style
+				/*this.titleDisplay.setStyle("color", 0xFFFFFF);
+				this.titleDisplay.setStyle("textAlign", "center");
+				this.titleDisplay.setStyle("fontSize", 12);
+				this.titleDisplay.setStyle("fontType", "bold");
+				this.titleDisplay.setStyle("fontFamily", "Verdana");*/
+				
+				if (!cmdObj)
+					cmdObj = new Object();
+				
+				if (!selectedUserObj)
+				selectedUserObj = parentApplication.lobby.userListPanel.userList_DG.selectedItem;
+				
+				cmdObj.selectedUserAcctID = selectedUserObj.acctID;
+				cmdObj.selectedUserID = selectedUserObj.userID;
+				cmdObj.selectedUserName = selectedUserObj.userName;
+				
+				cmdObj.clientID = parentApplication.lobby.mediaManager.clientID;
+				cmdObj.acctID = parentApplication.lobby.mediaManager.acctID;
+				cmdObj.userID = parentApplication.lobby.mediaManager.userID;
+				cmdObj.userName = parentApplication.lobby.mediaManager.userName;
+				cmdObj.roomName = parentApplication.loginPanel.roomName_TI.text;
+				
+				// move the popup if the menu is too far over/down to show the whole thing
+				if (parentApplication.lobby.contentMouseY > parentApplication.lobby.height-(this.height+5))
+				{
+					// menu extends past the bottom of the lobby
+					this.move(parentApplication.lobby.contentMouseX+10, parentApplication.lobby.height-(this.height+35));
+				} else {
+					// menu does not extend past the bottom
+					this.move(parentApplication.lobby.contentMouseX+10, parentApplication.lobby.contentMouseY-35);
+				}
+				
+				parentApplication.lobby.userListPanel.popUpMenu = this;
+				parentApplication.lobby.openPopUps_AC.addItem(this);
+				
+				if (!userListMenu_DP)
+				{
+					userListMenu_DP = new ArrayCollection();
+					userListMenu_DG.dataProvider = userListMenu_DP;
+					setupUserListMenuItems();
+				}
+				
+				userListMenu_DG.height = 25 * userListMenu_DP.length;
+				//userListMenu_DG.percentHeight = 100;
+				//
+				this.height = 30 + (25 * userListMenu_DP.length);
+				this.width = 160;
+				
+				//trace("######### userListMenu_DP.length ###########|>  "+userListMenu_DP.length);
+				
+				event = null;
+			}
+			
+			
+			// Handle the close button and Cancel button.
+			private function handleCloseEvent():void
+			{
+				if (parentApplication.lobby.openPopUps_AC.getItemIndex(this) != -1)
+				{
+					parentApplication.lobby.openPopUps_AC.removeItemAt(parentApplication.lobby.openPopUps_AC.getItemIndex(this));
+				}
+				
+				localUserID = '0';
+				userListMenu_DP = null;
+				selectedUserObj = null;
+				cmdObj = null;
+					
+				parentApplication.lobby.userListPanel.popUpMenu = null;
+				
+				PopUpManager.removePopUp(this);
+			}
+			
+			
+			private function formatMenuLabel(item:Object, column:DataGridColumn):String
+			{
+				var retVal:String = item.label;
+				
+				column = null;
+				item = null;
+				
+				return retVal;
+			}
+			
+			
+			private function setupUserListMenuItems():void
+			{
+				var localUserObj:Object = parentApplication.lobby.userListPanel.getUserObj(localUserID);
+				var viewItem:Object = new Object();
+				var pmItem:Object = new Object();
+				
+				var isSelectingLocalUser:Boolean = (((selectedUserObj.acctID==0)&&(selectedUserObj.userID==localUserID)) || 
+													((selectedUserObj.acctID!=0)&&(selectedUserObj.acctID==localUserObj.acctID)));
+				
+				this.title = selectedUserObj.userName;
+				
+				if (!selectedUserObj.hasBlocked && !parentApplication.lobby.isUserIgnored(selectedUserObj.acctID, (selectedUserObj.acctID==0 ? selectedUserObj.userName : selectedUserObj.nonDuplicateName)))
+				{
+					viewItem.label = "View";
+					viewItem.cmd = "view";
+					userListMenu_DP.addItem(viewItem);
+/*					if (selectedUserObj.userID != localUserID)
+					{
+						pmItem.label = "PM user (NOT WORKING)";
+						pmItem.cmd = "pm";
+						userListMenu_DP.addItem(pmItem);
+					}
+*/				}
+				
+				var whoisItem:Object = new Object();
+				whoisItem.label = "Whois";
+				whoisItem.cmd = "whois";
+				userListMenu_DP.addItem(whoisItem);
+				
+				// if this is not the local clients userlist item
+				if (!isSelectingLocalUser)
+				{
+					var isBlocked:Boolean = parentApplication.lobby.isUserIgnored(selectedUserObj.acctID, (selectedUserObj.acctID==0 ? selectedUserObj.userName : selectedUserObj.nonDuplicateName));
+					
+					if (isBlocked)
+					{
+						var unignoreItem:Object = new Object();
+						unignoreItem.label = "Unblock user";
+						unignoreItem.cmd = "unignore";
+						userListMenu_DP.addItem(unignoreItem);
+						unignoreItem = null;
+					} else /*if (selectedUserObj.adminType != "sa" && selectedUserObj.adminType != "ga" && selectedUserObj.adminType != "ra" && selectedUserObj.adminType != "rm")*/ {
+						var ignoreItem:Object = new Object();
+						ignoreItem.label = "Block user";
+						ignoreItem.cmd = "ignore";
+						userListMenu_DP.addItem(ignoreItem);
+						ignoreItem = null;
+					}
+				}
+				
+				var kickItem:Object = new Object();
+				if ((selectedUserObj.userID!=localUserID)&&
+					(localUserObj.adminType=="sa"||
+						localUserObj.adminType=="ga"||
+						localUserObj.adminType=="rh"||
+						localUserObj.adminType=="ra"||
+						localUserObj.adminType=="rm") &&
+						(selectedUserObj.adminType != "sa"))
+				{
+					kickItem.label = "Kick";
+					kickItem.cmd = "kick";
+					userListMenu_DP.addItem(kickItem);
+				}
+				
+				var banItem:Object = new Object();
+				if ((selectedUserObj.userID!=localUserID)&&
+					(localUserObj.adminType=="sa"||
+						localUserObj.adminType=="ga"||
+						localUserObj.adminType=="rh"||
+						localUserObj.adminType=="ra") &&
+						(selectedUserObj.adminType != "sa"))
+				{
+					banItem.label = "Ban";
+					banItem.cmd = "ban";
+					userListMenu_DP.addItem(banItem);
+				}
+				
+				var banIPItem:Object = new Object();
+				if ((selectedUserObj.userID!=localUserID)&&
+					(localUserObj.adminType=="sa"||
+						localUserObj.adminType=="ga") &&
+						(selectedUserObj.adminType != "sa"))
+				{
+					banIPItem.label = "IP Ban";
+					banIPItem.cmd = "banip";
+					userListMenu_DP.addItem(banIPItem);
+				}
+				
+				var setModItem:Object = new Object();
+				if ((selectedUserObj.acctID != 0) && 
+
+					(selectedUserObj.userID != localUserID) &&
+					((selectedUserObj.adminType != "sa") &&
+					(parentApplication.lobby.userListPanel.getUserObj(localUserID).adminType == "sa"||
+						parentApplication.lobby.userListPanel.getUserObj(localUserID).adminType=="ga"||
+						parentApplication.lobby.userListPanel.getUserObj(localUserID).adminType=="rh")))
+				{
+					setModItem.label = "(Un)Mod";
+					setModItem.cmd = "setmod";
+					userListMenu_DP.addItem(setModItem);
+				}
+				
+				viewItem = null;
+				pmItem = null;
+				whoisItem = null;
+				kickItem = null;
+				banItem = null;
+				banIPItem = null;
+				setModItem = null;
+			}
+			
+			
+			protected function userListMenu_DG_itemClickHandler(event:ListEvent):void
+			{
+				cmdObj.cmd = userListMenu_DG.selectedItem.cmd.toString().toLowerCase();
+				
+				var ignoreInfo:Object;
+				
+				switch (cmdObj.cmd)
+				{
+					case "view":
+						if (!selectedUserObj.hasBlocked)
+						{
+							//if ((parentApplication.lobby.camSpot6.isPlayingVideo && parentApplication.lobby.camSpot6.userInfoObj.isUsersVideoOn) || (parentApplication.lobby.camSpot6.isPlayingAudio && parentApplication.lobby.camSpot6.userInfoObj.isUsersAudioOn))
+							//{
+								// already playing media in the main cam, so dock the cam if possible
+							//	var tmpUserObj:Object = parentApplication.lobby.camSpot6.userInfoObj;
+							//	parentApplication.lobby.dockCamSpot(tmpUserObj);
+							//	parentApplication.lobby.camSpot6.dockCamSpot(selectedUserObj,"newUserSelected");
+							//	tmpUserObj = null;
+							//} else {
+								// not playing media in the main cam, so attach it like normal
+								// TEST
+								if (selectedUserObj.doNotDock==true)
+								{
+									for (var i:int = 0; i < parentApplication.lobby.userListPanel.userList_DP.length; ++i) 
+									{
+										if (parentApplication.lobby.userListPanel.userList_DP[i].userID == selectedUserObj.userID)
+										{
+											parentApplication.lobby.userListPanel.userList_DP[i].doNotDock = false;
+											break;
+										}
+									}
+								}
+								
+								if (selectedUserObj.isUsersVideoOn || selectedUserObj.isUsersAudioOn)
+									parentApplication.lobby.dockCamSpot(selectedUserObj);
+							//}
+						}
+						break;
+					case "pm" :
+						//parentApplication.lobby.userListPanel.userCmdObj = cmdObj;
+						//trace("userListMenu|>  popUpMenu: "+parentApplication.lobby.userListPanel.popUpMenu+"  CURRENT openPopUps_AC.length:  "+parentApplication.lobby.openPopUps_AC.length);
+						//PopUpManager.createPopUp(parentApplication.lobby, PrivateMessage_PopUpTitleWindow, false);
+						//trace("userListMenu|>  NEW openPopUps_AC.length:  "+parentApplication.lobby.openPopUps_AC.length);
+						break;
+					case "whois":
+						parentApplication.loginPanel.nc.call("adminCmd", null, cmdObj);
+						break;
+					case "ignore":
+						// TODO:
+						// receive the object from the server, then add it
+						/*
+						ignoreInfo = AppWide_Singleton.getUserInfoObj().ignores[(selectedUserObj.acctID == 0 ? "guest_" + selectedUserObj.userName : "member_" + selectedUserObj.acctID)];
+						
+						if (!ignoreInfo)
+						{
+							AppWide_Singleton.getInstance().userInfoObj.ignores[(selectedUserObj.acctID == 0 ? "guest_" + selectedUserObj.userName : "member_" + selectedUserObj.acctID)] = {};
+							
+							ignoreInfo = AppWide_Singleton.getUserInfoObj().ignores[(selectedUserObj.acctID == 0 ? "guest_" + selectedUserObj.userName : "member_" + selectedUserObj.acctID)];
+						}
+						
+						ignoreInfo.ignoredWhoID = selectedUserObj.userID;
+						ignoreInfo.ignoredWhoName = selectedUserObj.userName;
+						ignoreInfo.ignoredWhoAcctID = selectedUserObj.acctID;
+						*/
+						//parentApplication.loginPanel.nc.call("adminManager.ignoreUser", null, cmdObj);
+						parentApplication.loginPanel.nc.call("adminCmd", null, cmdObj);
+						//parentApplication.loginPanel.nc.client.dispatchEvent(new CustomEvent("ignoredUser", false, false, ignoreInfo));
+						break;
+					case "unignore":
+						ignoreInfo = AppWide_Singleton.getUserInfoObj().ignores[(selectedUserObj.acctID == 0 ? "guest_" + selectedUserObj.userName : "member_" + selectedUserObj.acctID)];
+						cmdObj.ignoreInfo = ignoreInfo;
+						//parentApplication.loginPanel.nc.call("adminManager.unignoreUser", null, cmdObj);
+						parentApplication.loginPanel.nc.call("adminCmd", null, cmdObj);
+						//parentApplication.loginPanel.nc.client.dispatchEvent(new CustomEvent("unignoredUser", false, false, ignoreInfo));
+						break;
+					case "kick":
+						parentApplication.lobby.userListPanel.popUpMenu = null;
+						PopUpManager.createPopUp(parentApplication.lobby, KickConfirmation_PopUpTitleWindow, true);
+						break;
+					case "ban":
+						parentApplication.lobby.userListPanel.popUpMenu = null;
+						parentApplication.lobby.userListPanel.userCmdObj = cmdObj;
+						PopUpManager.createPopUp(parentApplication.lobby, BanConfirmation_PopUpTitleWindow, true);
+						break;
+					case "banip":
+						parentApplication.lobby.userListPanel.popUpMenu = null;
+						PopUpManager.createPopUp(parentApplication.lobby, BanIPRange_PopUpTitleWindow, true);
+						break;
+					case "setmod":
+						parentApplication.lobby.tmpStr = 'setmod';
+						parentApplication.lobby.userListPanel.popUpMenu = null;
+						PopUpManager.createPopUp(parentApplication.lobby, AdminPanel_PopUpTitleWindow, true);
+						break;
+				}
+				
+				/*
+				for (var i:Object in parentApplication.lobby.openPopUps_AC)
+				{
+					if (parentApplication.lobby.openPopUps_AC[i] is PrivateMessage_PopUpTitleWindow)
+					{
+						if (parentApplication.lobby.openPopUps_AC[i].cmdObj.selectedUserID == cmdObj.selectedUserID)
+						{
+							trace("userListMenu|>  WINDOW FOUND!");
+						}
+					}
+				}
+				
+				i = null;
+				*/
+				
+				handleCloseEvent();
+				
+				cmdObj = null;
+				ignoreInfo = null;
+				event = null;
+			}
+			
+			
+			
+			private function titleWin_windowMovingHandler(event:TitleWindowBoundsEvent):void
+			{
+				if (event.afterBounds.left < 0) {
+					event.afterBounds.left = 0;
+				} else if (event.afterBounds.right > systemManager.stage.stageWidth) {
+					event.afterBounds.left = systemManager.stage.stageWidth - event.afterBounds.width;
+				}
+				if (event.afterBounds.top < 0) {
+					event.afterBounds.top = 0;
+				} else if (event.afterBounds.bottom > systemManager.stage.stageHeight) {
+					event.afterBounds.top = systemManager.stage.stageHeight - event.afterBounds.height;
+				}
+				
+				event = null;
+			}
+			
+			
+			
+			
+			
+			
+		]]>
+	</fx:Script>
+	
+	
+	<mx:DataGrid id="userListMenu_DG"
+				 width="160" 
+				 borderVisible="false"
+				 color="0xFFFFFF"
+				 selectionColor="0x19B819"
+				 alternatingItemColors="0x393939"
+				 showHeaders="false"
+				 itemClick="userListMenu_DG_itemClickHandler(event)">
+		<mx:columns>
+			<mx:DataGridColumn labelFunction="formatMenuLabel"/>
+		</mx:columns>
+	</mx:DataGrid>
+	
+	
+</s:TitleWindow>

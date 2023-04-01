@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:MXDataGridItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+						  xmlns:s="library://ns.adobe.com/flex/spark" 
+						  xmlns:mx="library://ns.adobe.com/flex/mx" 
+						  focusEnabled="true">
+	
+	
+	<!-- LAYOUT ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	
+	<s:layout>
+		<s:HorizontalLayout verticalAlign="middle"/>
+	</s:layout>
+	
+	
+	<!-- STATES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	<!--
+	<s:states>
+	</s:states>
+	-->
+	
+	<!-- METADATA ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	
+	<fx:Metadata>
+	</fx:Metadata>
+	
+	
+	<!-- SCRIPT ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	<fx:Script>
+		<![CDATA[
+			import me.whohacked.app.IconManager_Singleton;
+			/*
+			// icon for a user who is ignored
+			[@Embed(source='../../assets/ignoredIcon.png')]
+			[Bindable]
+			protected var ignoredImg:Class;
+			[@Embed(source='../../assets/userlist-users.png')]
+			[Bindable]
+			protected var userList_usersImg:Class;
+			[@Embed(source='../../assets/userlist-guest.png')]
+			[Bindable]
+			protected var userList_guestImg:Class;
+			[@Embed(source='../../assets/userlist-member.png')]
+			[Bindable]
+			protected var userList_memberImg:Class;
+			[@Embed(source='../../assets/userlist-rm.png')]
+			[Bindable]
+			protected var userList_rmImg:Class;
+			[@Embed(source='../../assets/userlist-ra.png')]
+			[Bindable]
+			protected var userList_raImg:Class;
+			[@Embed(source='../../assets/userlist-ga.png')]
+			[Bindable]
+			protected var userList_gaImg:Class;
+			[@Embed(source='../../assets/userlist-sa.png')]
+			[Bindable]
+			protected var userList_saImg:Class;
+			*/
+			private var __iconManager:IconManager_Singleton = IconManager_Singleton.getInstance();
+			
+			
+			override public function set data(value:Object):void
+			{
+				if (!value) return;
+				
+				value.adminType = value.adminType.toString().toLocaleLowerCase();
+				
+				super.data = value;
+				
+				formatUserName();
+				
+				value = null;
+			}
+			
+			
+			private function formatUserName():void
+			{
+				// nullify the current icon source
+				userIconImg.source = null;
+				
+				if (data.isIgnored)
+				{
+					userIconImg.source = __iconManager.getIcon('app_userList_ignored'); // new ignoredImg();
+					
+					return;
+				}
+				
+				if (data.acctID == 0)
+					userIconImg.source = __iconManager.getIcon('app_userList_guest');
+				else if ((data.adminType == 'rm') || 
+						(data.adminType == 'ra') || 
+						(data.adminType == 'rh') || 
+						(data.adminType == 'ga') || 
+						(data.adminType == 'sa'))
+					userIconImg.source = __iconManager.getIcon('app_userList_'+data.adminType);
+				else
+					userIconImg.source = __iconManager.getIcon('app_userList_member');
+				/*
+				if (data.adminType == "rm")
+				{
+					userIconImg.source = userList_rmImg;
+				} else if (data.adminType == "ra") {
+					userIconImg.source = userList_raImg;
+				} else if (data.adminType == "ga") {
+					userIconImg.source = userList_gaImg;
+				} else if (data.adminType == "sa") {
+					userIconImg.source = userList_saImg;
+				} else if (data.acctID != "0") {
+					userIconImg.source = userList_memberImg;
+				} else if (data.acctID == "0") {
+					userIconImg.source = userList_guestImg;
+				}
+				*/
+			}
+			
+			
+		]]>
+	</fx:Script>
+	
+	
+	<!-- DECLARATIONS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (services, value objects, etc) here -->
+	</fx:Declarations>
+	
+	
+	<!-- UI COMPONENTS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	
+	<s:BitmapImage id="userIconImg" 
+				   height="15" width="15"
+				   horizontalCenter="0" 
+				   verticalCenter="0"
+				   clearOnLoad="true"/>
+	
+	
+	
+</s:MXDataGridItemRenderer>

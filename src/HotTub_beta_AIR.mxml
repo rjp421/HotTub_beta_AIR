@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+BongTVLive.com Hot Tub 2.0 beta7 by b0nghitter
+-->
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:components="components.*"
+			   width="1165" height="685" 
+			   preinitialize="preinitializeHandler(event)"
+			   initialize="initializeHandler(event)" 
+			   applicationComplete="applicationCompleteHandler(event)"
+			   preloaderChromeColor="#006600">
+	
+	
+	
+	
+	
+	<!-- METADATA ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	
+	
+	
+	
+	
+	<!-- STATES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	
+	<s:states>
+		<s:State name="loginState"/>
+		<s:State name="chatState"/>
+	</s:states>
+	
+	
+	
+	
+	
+	<!-- LAYOUTS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	<!--
+	<s:layout>
+	<s:BasicLayout />
+	</s:layout>
+	-->
+	
+	
+	<!-- SCRIPTS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	
+	<fx:Script source="scripts/HotTub_beta_AIR.as"/>
+	
+	
+	
+	
+	
+	<!-- CSS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	
+	<fx:Style source="assets/CSS/HotTub.css"/>
+	
+	
+	
+	
+	
+	<!-- DECLARATIONS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (services, value objects, etc) here -->
+	</fx:Declarations>
+	
+	
+	
+	
+	
+	
+	<!-- UI COMPONENTS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	
+	
+	
+	<!-- background image on the bottom -->
+	<s:BitmapImage id="tubBg_I"
+				   width="100%" height="100%"/>
+	
+	
+	
+	
+	<!-- application bar on top, and chat below -->
+	<s:VGroup width="100%" height="100%" gap="0" 
+			  horizontalAlign="center"
+			  verticalAlign="middle">
+		
+		<components:ApplicationBar id="applicationBar"
+								   width="100%" height="30"/>
+		
+		<components:Lobby id="lobby" 
+						  visible.loginState="false" 
+						  visible.chatState="true"/>
+		
+	</s:VGroup>
+	
+	
+	
+	
+	<!-- login panel, layered on top of the other components -->
+	<components:LoginPanel id="loginPanel" 
+						   width="580" 
+						   verticalCenter="0"
+						   horizontalCenter="0"
+						   alpha=".80"
+						   visible.loginState="true" 
+						   visible.chatState="false"/>
+	
+	
+	
+	
+</s:WindowedApplication>

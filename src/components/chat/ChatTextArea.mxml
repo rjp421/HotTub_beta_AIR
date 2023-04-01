@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 width="100%" height="100%">
+	
+	
+	<!-- LAYOUTS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	
+	<s:layout>
+		<s:BasicLayout/>
+	</s:layout>
+	
+	
+	<!-- STATES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<!--	
+	<s:states>
+	</s:states>
+-->	
+	
+	<!-- METADATA ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	
+	
+	<!-- SCRIPTS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	
+	
+	<!-- DECLARATIONS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (services, value objects, etc) here -->
+	</fx:Declarations>
+	
+	
+	<!-- UI COMPONENTS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	<mx:TextArea id="chatTextArea_TA"
+				 width="100%" height="100%" 
+				 textAlign="left" editable="false"
+				 focusEnabled="false"
+				 symbolColor="#000000" 
+				 borderVisible="false"
+				 contentBackgroundColor="#EEEEEE" 
+				 contentBackgroundAlpha="0.9"/>
+	<!--
+	<s:TextArea id="chatTextArea_TA"
+				 width="100%" height="100%" 
+				 textAlign="left" editable="false"
+				 focusEnabled="false"
+				 symbolColor="#000000" 
+				 borderVisible="false"
+				 contentBackgroundColor="#EEEEEE" 
+				 contentBackgroundAlpha="0.9"/>
+	-->
+	
+	
+</s:Group>

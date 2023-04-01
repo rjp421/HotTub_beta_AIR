@@ -1,0 +1,300 @@
+/* CSS file */
+@namespace s "library://ns.adobe.com/flex/spark";
+@namespace mx "library://ns.adobe.com/flex/mx";
+@namespace itemrenderers "components.itemrenderers.*";
+@namespace popups "components.popups.*";
+@namespace components "components.*";
+
+
+
+@font-face 
+{ 
+	src: url(c:\Windows\Fonts\verdanab.ttf);
+	fontFamily: "Verdana";
+	embedAsCFF: true;
+}
+
+
+@font-face 
+{ 
+	src: url(c:\Windows\Fonts\verdanab.ttf);
+	fontFamily: "Verdana_nocff";
+	embedAsCFF: false;
+}
+
+
+
+
+.userNameLabel
+{
+	color: #00FF00;
+	fontSize: 18;
+	dropShadowColor: #00FF00;
+	dropShadowEnabled: true;
+	dropShadowVisible: true;
+}
+
+
+global
+{
+}
+
+
+s|Application
+{
+	fontSize: 14;
+	fontWeight: bold;
+	fontFamily: "Verdana";
+	
+	color: #EEEEEE;
+	symbolColor: #EEEEEE;
+	focusColor: #EEEEEE;
+	chromeColor: #006600;
+	backgroundColor: #393939;
+	contentBackgroundColor: #333333;
+	
+	textAlign: center;
+	horizontalAlign: center;
+	verticalAlign: middle;
+	
+	/*
+	rollOverColor: #00B200;
+	selectionColor: #1A6600;
+	accentColor: #59B200;
+	*/
+}
+
+
+s|Label
+{
+}
+
+
+s|Label #toolTip
+{
+	color: #000000;
+/*	fontFamily: "Verdana_nocff";*/
+	fontWeight: normal;
+}
+
+
+s|CheckBox
+{
+}
+
+
+s|RadioButton
+{
+}
+
+
+s|Button #labelDisplay
+{
+	fontSize: 12;
+	fontWeight: normal;
+	text-align: center;
+}
+
+
+components|BandwidthChart s|Button #labelDisplay
+{
+	fontSize: 8;
+	fontWeight: normal;
+	text-align: center;
+}
+
+/*
+s|Button s|Label
+{
+	fontSize: 12;
+}
+*/
+
+
+s|TextArea
+{
+	color: #000000;
+	textAlign: left;
+}
+
+
+s|TextInput
+{
+	fontSize: 12;
+	fontWeight: normal;
+	textAlign: center;
+	
+	contentBackgroundColor: #006600;
+}
+
+
+/*
+s|List
+{
+	rollOverColor: #00B200;
+	selectionColor: #00A600;
+	alternatingItemColors: #006600;
+}
+*/
+
+
+s|Panel
+{
+	textAlign: center;
+}
+
+
+s|Panel #titleDisplay
+{
+	fontSize: 20;
+	text-align: center;
+}
+
+/*
+s|Alert
+{
+	fontSize: 14;
+	color: #000000;
+	textAlign: center;
+}*/
+
+
+mx|Alert
+{
+	color: #000000;
+	textAlign: center;
+}
+
+
+mx|Text
+{
+	color: #EEEEEE;
+	font-family: Verdana, Geneva, sans-serif;
+	text-align: center;
+}
+
+
+mx|ToolTip
+{
+	color: #000000;
+	fontFamily: sans-serif;
+	fontWeight: normal;
+}
+
+
+mx|DataTip
+{
+	color: #000000;
+	fontFamily: sans-serif;
+	fontWeight: normal;
+}
+
+
+mx|DataGrid
+{
+	rollOverColor: #00B200;
+	selectionColor: #00A600;
+	alternatingItemColors: #006600;
+	contentBackgroundColor: #393939;
+	contentBackgroundAlpha: 0.80;
+}
+
+
+mx|LineChart
+{
+	color: #EEEEEE;
+	fontFamily: sans-serif;
+	fontWeight: normal;
+	fontAntiAliasType: advanced;
+	fontGridFitType: subpixel;
+	fontSize: 8;
+}
+
+
+mx|LineSeries
+{
+	color: #EEEEEE;
+	fontFamily: sans-serif;
+	fontWeight: normal;
+	fontAntiAliasType: advanced;
+	fontGridFitType: subpixel;
+	fontSize: 8;
+}
+
+mx|AxisRenderer
+{
+	color: #EEEEEE;
+	fontFamily: sans-serif;
+	fontWeight: normal;
+	fontAntiAliasType: advanced;
+	fontGridFitType: subpixel;
+	fontSize: 8;
+}
+
+/*
+mx|Legend
+{
+	color: #EEEEEE;
+	fontFamily: sans-serif;
+	fontWeight: normal;
+	fontAntiAliasType: advanced;
+	fontGridFitType: subpixel;
+	fontSize: 8;
+}
+*/
+
+
+
+
+
+
+
+/**********************************************************************/
+
+itemrenderers|UserListPanel_UserIconItemRenderer
+{
+	backgroundColor: #009900;
+}
+
+itemrenderers|UserListPanel_UserNameItemRenderer
+{
+	fontSize: 12;
+	backgroundColor: #009900;
+}
+
+itemrenderers|UserListPanel_MediaIconItemRenderer
+{
+	backgroundColor: #009900;
+}
+
+
+
+popups|UserListMenu_PopUpTitleWindow
+{
+	fontSize: 12;
+}
+
+
+popups|UserListMenu_PopUpTitleWindow #titleDisplay
+{
+	fontSize: 14;
+}
+
+
+popups|ApplicationSettings_PopUpTitleWindow
+{
+	fontSize: 12;
+}
+
+
+popups|ApplicationSettings_PopUpTitleWindow #titleDisplay
+{
+	fontSize: 14;
+}
+
+
+
+
+
+
+

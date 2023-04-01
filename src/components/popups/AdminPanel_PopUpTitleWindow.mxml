@@ -1,0 +1,773 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" 
+			   title="Admin Options" backgroundColor="#249F18"
+			   close="handleCloseEvent()" 
+			   creationComplete="creationCompleteHandler(event)"
+			   windowMoving="titleWin_windowMovingHandler(event)">
+	
+	
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		<s:RadioButtonGroup id="selectedAdminType_RBG"
+							change="selectedAdminType_RBG_changeHandler(event)" 
+							valueCommit="adminType_RBG_valueCommitHandler(event)"/>
+	</fx:Declarations>
+	
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			import mx.managers.PopUpManager;
+			
+			import spark.events.TitleWindowBoundsEvent;
+			import spark.primitives.BitmapImage;
+			
+			import events.CustomEvent;
+			
+			import me.whohacked.app.AppWideDebug_Singleton;
+			import me.whohacked.app.AppWideEventDispatcher_Singleton;
+			import me.whohacked.app.IconManager_Singleton;
+			
+			
+			private var localUserObj:Object;
+			private var tmpFullAdminType_Arr:Array;
+			private var cmdObj:Object = new Object();
+			private var tmpObj:Object = new Object();
+			
+			
+			
+			private function creationCompleteHandler(event:FlexEvent):void
+			{
+				parentApplication.lobby.openPopUps_AC.addItem(this);
+				PopUpManager.centerPopUp(this);
+				
+				localUserObj = parentApplication.lobby.userListPanel.getUserObj(parentApplication.lobby.mediaManager.userID);
+				localUserObj.clientID = parentApplication.lobby.mediaManager.clientID;
+				
+				cmdObj.clientID = parentApplication.lobby.mediaManager.clientID;
+				cmdObj.acctID = parentApplication.lobby.mediaManager.acctID;
+				cmdObj.userID = parentApplication.lobby.mediaManager.userID;
+				cmdObj.userName = parentApplication.lobby.mediaManager.userName;
+				cmdObj.roomName = parentApplication.loginPanel.roomName_TI.text;
+				cmdObj.selectedUserAcctID = parentApplication.lobby.userListPanel.userList_DG.selectedItem.acctID;
+				cmdObj.selectedUserID = parentApplication.lobby.userListPanel.userList_DG.selectedItem.userID;
+				cmdObj.selectedUserName = parentApplication.lobby.userListPanel.userList_DG.selectedItem.userName;
+				
+				tmpObj.selectedUserAdminType = parentApplication.lobby.userListPanel.userList_DG.selectedItem.adminType;
+				
+				// populate the options
+				adminPass_TI.text = parentApplication.loginPanel.password_TI.text;
+				
+				selectedUserName_TI.text = cmdObj.selectedUserName;
+				selectedUserAcctID_TI.text = cmdObj.selectedUserAcctID;
+				
+				adminType_ra_Img.source = IconManager_Singleton.getInstance().getIcon('app_userList_ra');
+				adminType_rm_Img.source = IconManager_Singleton.getInstance().getIcon('app_userList_rm');
+				adminType_notadmin_Img.source = IconManager_Singleton.getInstance().getIcon('app_userList_member');
+				
+				// auto-show the advanced settings for super/global admin
+				if (localUserObj.adminType == 'sa' ||
+					localUserObj.adminType == 'ga')
+				{
+					//enableAdvancedView(); // TODO: move to an option for advanced/basic view
+					
+					adminType_ga_Img.source = IconManager_Singleton.getInstance().getIcon('app_userList_ga');
+					adminType_ga_Group.enabled = true;
+					adminType_ga_Group.includeInLayout = true;
+					adminType_ga_Img.includeInLayout = true;
+					adminType_ga_RB.includeInLayout = true;
+					adminType_ga_Group.visible = true;
+					adminType_ga_Img.visible = true;
+					adminType_ga_RB.visible = true;
+					
+					adminType_rh_Img.source = IconManager_Singleton.getInstance().getIcon('app_userList_rh');
+					adminType_rh_Group.enabled = true;
+					adminType_rh_Group.includeInLayout = true;
+					adminType_rh_Img.includeInLayout = true;
+					adminType_rh_RB.includeInLayout = true;
+					adminType_rh_Group.visible = true;
+					adminType_rh_Img.visible = true;
+					adminType_rh_RB.visible = true;
+				}
+				
+				switch (parentApplication.lobby.tmpStr)
+				{
+					case 'setmod':
+					{
+						// get the current value
+						cmdObj.cmd = 'getmod';
+						cmdObj.adminPass = adminPass_TI.text;
+						
+						propName_TI.text = 'admin_level';
+						propVal_TI.prompt = "Getting info...";
+						
+						if (!AppWideEventDispatcher_Singleton.getInstance().hasEventListener("onGetUserPropertyResult"))
+							AppWideEventDispatcher_Singleton.getInstance().addEventListener("onGetUserPropertyResult", onGetUserPropertyResult, false,0,true);
+						
+						parentApplication.loginPanel.nc.call("adminManager.getUserProperty", null, cmdObj.clientID, cmdObj.selectedUserAcctID, propName_TI.text);
+						
+						break;
+					}
+						
+					default:
+					{
+						break;
+					}
+				}
+				
+				localUserObj = null;
+				event = null;
+			}
+			
+			
+			private function enableAdvancedView():void
+			{
+				//advancedView_Group.includeInLayout = true;
+				//advancedView_Group.visible = true;
+				
+				advancedView_acctID.includeInLayout = true;
+				selectedUserAcctID_L.includeInLayout = true;
+				selectedUserAcctID_TI.includeInLayout = true;
+				advancedView_acctID.visible = true;
+				selectedUserAcctID_L.visible = true;
+				selectedUserAcctID_TI.visible = true;
+				
+				advancedView_propName.includeInLayout = true;
+				propName_L.includeInLayout = true;
+				propName_TI.includeInLayout = true;
+				advancedView_propName.visible = true;
+				propName_L.visible = true;
+				propName_TI.visible = true;
+				
+				advancedView_propVal.includeInLayout = true;
+				propVal_L.includeInLayout = true;
+				propVal_TI.includeInLayout = true;
+				advancedView_propVal.visible = true;
+				propVal_L.visible = true;
+				propVal_TI.visible = true;
+			}
+			
+			
+			// Handle the close button and Cancel button.
+			private function handleCloseEvent():void
+			{
+				if (AppWideEventDispatcher_Singleton.getInstance().hasEventListener("onGetUserPropertyResult"))
+					AppWideEventDispatcher_Singleton.getInstance().removeEventListener("onGetUserPropertyResult", onGetUserPropertyResult);
+				
+				parentApplication.lobby.tmpStr = null;
+				
+				tmpFullAdminType_Arr.splice(0);
+				tmpFullAdminType_Arr = null;
+				localUserObj = null;
+				cmdObj = null;
+				tmpObj = null;
+				
+				adminType_ga_Img.source = null;
+				adminType_rh_Img.source = null;
+				adminType_ra_Img.source = null;
+				adminType_rm_Img.source = null;
+				//adminType_vip_Img.source = null;
+				adminType_notadmin_Img.source = null;
+				
+				parentApplication.lobby.openPopUps_AC.removeItemAt(parentApplication.lobby.openPopUps_AC.getItemIndex(this));
+				
+				PopUpManager.removePopUp(this);
+			}
+			
+			
+			// handle response from mod.php
+			private function onGetUserPropertyResult(event:CustomEvent):void
+			{
+				var resultObj:Object = event.eventObj;
+				
+				//tmpObj.resultObj = resultObj;
+				tmpFullAdminType_Arr = resultObj.resultAdminType.split(",");
+				
+				trace("onGetUserPropertyResult->  resultObj: "+resultObj+"  ok: "+resultObj.ok+"  status: "+resultObj.status+"  resultAdminType: "+resultObj.resultAdminType+"  tmpFullAdminType_Arr: "+tmpFullAdminType_Arr.toString());
+				
+				if (AppWideEventDispatcher_Singleton.getInstance().hasEventListener("onGetUserPropertyResult"))
+					AppWideEventDispatcher_Singleton.getInstance().removeEventListener("onGetUserPropertyResult", onGetUserPropertyResult);
+				
+				// update the admintype
+				tmpObj.selectedUserAdminType = resultObj.resultAdminType.toLocaleLowerCase();
+				
+				// set the current admin type
+				var adminType:String = resultObj.resultAdminType.toLowerCase().indexOf("_definst_") == -1 ?
+										resultObj.resultAdminType.split(cmdObj.roomName + ":")[1].split(",")[0] :
+										'notadmin';
+				
+				//propVal_TI.text = tmpObj.resultObj.resultAdminType;
+				propVal_TI.text = resultObj.resultAdminType;
+				propVal_TI.enabled = true;
+				
+				if (this['adminType_'+adminType+'_RB'])
+				{
+					this['adminType_'+adminType+'_RB'].selected = true;
+				}
+				
+				adminTypeSelection_VG.enabled = true;
+				
+				adminType = null;
+				resultObj = null;
+				event = null;
+			}
+			
+			
+			private function adminType_RBG_valueCommitHandler(event:Event):void
+			{
+				if (event.target.selectedValue==null) return;
+				
+				var selectedAdminType:String = event.target.selection.id.toString().split('_')[1];
+				//if (selectedAdminType == localUserObj.adminType) return;
+				
+				tmpObj.selectedAdminType = selectedAdminType;
+				
+				trace("adminType_RBG_valueCommitHandler->  <SELECTED>  id: " + event.target.selection.id + "  selectedValue: "+event.target.selectedValue+"  selectedAdminType: "+selectedAdminType);
+				/*
+				var tmpPropValText:String = propVal_TI.text;
+				var adminSelected:Boolean = selectedAdminType != "notadmin";
+				
+				// dont reset the propVal_TI text,
+				// just replace the roomname:admintype.
+				// a temp string based on the original admin type
+				
+				// if the current text does not include _definst_,
+				// then use the correct roomName
+				var origRoomAdminType:String = parseRoomAdminType();
+											//adminSelected ? 
+											//tmpPropValText.split(",")[0] :
+											//'notadmin'
+				
+				//var tmpReplaceStr:String = tmpFullAdminType_Arr.length ? '/' + cmdObj.roomName + ':' + origRoomAdminType + '/' : '/_definst:notadmin_/';
+				var tmpReplaceStr:String = tmpObj.selectedUserAdminType;
+				var tmpReplaceStrWith:String = tmpFullAdminType_Arr.length ? 
+												tmpObj.selectedUserAdminType.replace(new RegExp(origRoomAdminType + ','), '') : 
+												(adminSelected ? cmdObj.roomName + ':' + selectedAdminType : '_definst_:notadmin');
+				
+				var replaceStr:RegExp = new RegExp(tmpReplaceStr, 'gi');
+				var replaceStrWith:RegExp = new RegExp(tmpReplaceStrWith, 'gi');
+				
+				tmpObj.selectedUserAdminType = tmpReplaceStr.replace(replaceStr, tmpReplaceStrWith);
+				
+				// TEMP: make sure it sends admin_level,
+				// and hope it isnt changed before clicking ok.
+				propName_TI.text = "admin_level";
+				
+				// TODO: check if the selected user is an admin
+				// in other rooms. if so, then add the current 
+				// roomName:adminType to the original full adminType.
+				
+				// if the notadmin_RB was chosen, 
+				// and the selected user has admin in more than one room...
+				if ((selectedAdminType.indexOf('notadmin') != -1) && 
+					(tmpFullAdminType_Arr.length))
+				{
+					// strip the current 'roomName:adminType,' 
+					// from the full original adminType string.
+					
+					// TEMP: re-replace the broken new string,
+					// for now just replace the "_definst_:notadmin," with "".
+					// WARNING the string must not end with "," or it wont work
+					tmpObj.selectedUserAdminType = tmpObj.selectedUserAdminType.replace(new RegExp(/_definst_:notadmin,/), ''); // TEMP FIX
+				}
+				else if ((tmpReplaceStrWith.indexOf('notadmin') == -1) && 
+						(tmpReplaceStrWith.indexOf(cmdObj.roomName) == -1))
+				{
+					// else if the original full adminType string 
+					// did not include the current roomName, but 
+					// did for another room, add the origRoomAdminType+','...
+					if (tmpFullAdminType_Arr.indexOf(origRoomAdminType) == -1)
+						tmpFullAdminType_Arr.push(origRoomAdminType);
+					
+					for (var i:int = 0; i < tmpFullAdminType_Arr.length -1; ++i) 
+					{
+						var tmpStr:String = tmpFullAdminType_Arr[i];
+						
+						if (i == 0)
+							tmpObj.selectedUserAdminType = tmpStr;
+						else
+							tmpObj.selectedUserAdminType += ',' + tmpStr;
+						
+						tmpStr = null;
+					}
+				} else {
+					// else 
+					if (tmpObj.selectedUserAdminType.indexOf() == -1)
+					{
+					}
+				}
+				*/
+				//propVal_TI.text = tmpObj.resultObj.resultAdminType;
+				
+				if (selectedAdminType != "notadmin")
+				{
+					propVal_TI.text = "lobby:"+selectedAdminType;
+				} else {
+					propVal_TI.text = "_definst_:notadmin"; 
+				}
+				/*
+				tmpReplaceStrWith = null;
+				tmpReplaceStr = null;
+				replaceStr = null;
+				replaceStrWith = null;
+				origRoomAdminType = null;
+				tmpPropValText = null;*/
+				selectedAdminType = null;
+				event = null;
+			}
+			
+			
+			// parse and return the roomName:adminType for the current room
+			private function parseRoomAdminType():String
+			{
+				var retStr:String = '';
+				
+				for (var i:int = 0; i < tmpFullAdminType_Arr.length; ++i) 
+				{
+					var tmpPropValStr:String = tmpFullAdminType_Arr[i];
+					
+					if (tmpPropValStr.split(':')[0] == cmdObj.roomName)
+					{
+						retStr = tmpPropValStr;
+					}
+					
+					tmpPropValStr = null;
+				}
+				
+				return retStr;
+			}
+			
+			
+			private function okBtn_clickHandler(event:MouseEvent):void
+			{
+				if (tmpObj.selectedAdminType == tmpObj.selectedUserAdminType) return;
+				
+				// TEMP value must contain a colon (roomName:adminType)
+				if ((propName_TI.text == "admin_level") && 
+					(propVal_TI.text.length) &&
+					(propVal_TI.text.indexOf(":") == -1))
+					return;
+				
+				cmdObj.cmd = 'setmod';
+				cmdObj.adminPass = adminPass_TI.text;
+				cmdObj.propName = propName_TI.text;
+				cmdObj.propVal = propVal_TI.text;
+				
+				parentApplication.loginPanel.nc.call("adminCmd", null, cmdObj);
+				
+				event = null;
+				
+				handleCloseEvent();
+			}
+			
+			
+			private function cancelBtn_clickHandler(event:MouseEvent):void
+			{
+				event = null;
+				
+				handleCloseEvent();
+			}
+			
+			
+			private function titleWin_windowMovingHandler(event:TitleWindowBoundsEvent):void
+			{
+				if (event.afterBounds.left < 0) {
+					event.afterBounds.left = 0;
+				} else if (event.afterBounds.right > systemManager.stage.stageWidth) {
+					event.afterBounds.left = systemManager.stage.stageWidth - event.afterBounds.width;
+				}
+				if (event.afterBounds.top < 0) {
+					event.afterBounds.top = 0;
+				} else if (event.afterBounds.bottom > systemManager.stage.stageHeight) {
+					event.afterBounds.top = systemManager.stage.stageHeight - event.afterBounds.height;
+				}
+				
+				event = null;
+			}
+			
+			
+			protected function selectedAdminType_RBG_changeHandler(event:Event):void
+			{
+				//trace("selectedAdminType_RBG_changeHandler->  <CALLED>  selectedValue: " + selectedAdminType_RBG.selectedValue);
+				
+				// TODO
+				// verify the admin can set this
+				// admin_level for the current room
+				
+				
+				
+				event = null;
+			}
+			
+			
+			protected function isAdvancedViewSelected_CB_changeHandler(event:Event):void
+			{
+				trace("isAdvancedViewSelected_CB_changeHandler->  <CALLED>  isAdvancedViewSelected_CB.selected: " + isAdvancedViewSelected_CB.selected);
+				
+				// show/hide advanced options
+				var _isAdvancedViewSelected:Boolean = isAdvancedViewSelected_CB.selected;
+				
+				// TODO
+				// 
+				if (_isAdvancedViewSelected)
+				{
+					// hide the radio buttons
+					adminTypeSelection_VG.includeInLayout = false;
+					adminTypeSelection_VG.visible = false;
+					
+					//advancedView_Group.includeInLayout = true;
+					//advancedView_Group.visible = true;
+					
+					advancedView_acctID.includeInLayout = true;
+					selectedUserAcctID_L.includeInLayout = true;
+					selectedUserAcctID_TI.includeInLayout = true;
+					advancedView_acctID.visible = true;
+					selectedUserAcctID_L.visible = true;
+					selectedUserAcctID_TI.visible = true;
+					
+					advancedView_propName.includeInLayout = true;
+					propName_L.includeInLayout = true;
+					propName_TI.includeInLayout = true;
+					advancedView_propName.visible = true;
+					propName_L.visible = true;
+					propName_TI.visible = true;
+					
+					advancedView_propVal.includeInLayout = true;
+					propVal_L.includeInLayout = true;
+					propVal_TI.includeInLayout = true;
+					advancedView_propVal.visible = true;
+					propVal_L.visible = true;
+					propVal_TI.visible = true;
+					
+					// show editablePropVal_TI 
+					//advancedView_editablePropVal_HG.includeInLayout = true;
+					//advancedView_editablePropVal_HG.visible = true;
+				} else {
+					//advancedView_Group.includeInLayout = true;
+					//advancedView_Group.visible = true;
+					
+					advancedView_acctID.includeInLayout = false;
+					selectedUserAcctID_L.includeInLayout = false;
+					selectedUserAcctID_TI.includeInLayout = false;
+					advancedView_acctID.visible = false;
+					selectedUserAcctID_L.visible = false;
+					selectedUserAcctID_TI.visible = false;
+					
+					advancedView_propName.includeInLayout = false;
+					propName_L.includeInLayout = false;
+					propName_TI.includeInLayout = false;
+					advancedView_propName.visible = false;
+					propName_L.visible = false;
+					propName_TI.visible = false;
+					
+					advancedView_propVal.includeInLayout = false;
+					propVal_L.includeInLayout = false;
+					propVal_TI.includeInLayout = false;
+					advancedView_propVal.visible = false;
+					propVal_L.visible = false;
+					propVal_TI.visible = false;
+					
+					// hide editablePropVal_TI
+					//advancedView_editablePropVal_HG.includeInLayout = false;
+					//advancedView_editablePropVal_HG.visible = false;
+					
+					// show the radio buttons
+					adminTypeSelection_VG.includeInLayout = true;
+					adminTypeSelection_VG.visible = true;
+				}
+				
+				event = null;
+			}
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			private function debugMsg(str:String):void
+			{
+				AppWideDebug_Singleton.getInstance().newDebugMessage(this.id, str);
+			}
+			
+			
+		]]>
+	</fx:Script>
+	
+	
+	<s:layout>
+		<s:VerticalLayout horizontalAlign="center"
+						  verticalAlign="middle"
+						  paddingLeft="20"
+						  paddingRight="20"/>
+	</s:layout>
+	
+	<s:states>
+		<s:State name="mainState"/>
+		<s:State name="advancedViewState"/>
+	</s:states>
+	
+	
+	
+	<s:Spacer height="10"/>
+	
+	
+	<s:HGroup width="100%" horizontalAlign="center"
+			  verticalAlign="middle">
+		<s:Label text="Username:"/>
+		<s:TextInput id="selectedUserName_TI"
+					 editable="false"/>
+	</s:HGroup>
+	<!--
+	<s:Group id="advancedView_Group"
+			 width="100%" 
+			 visible="false"
+			 includeInLayout="false">
+		-->
+		<s:HGroup id="advancedView_acctID"
+				  width="100%" horizontalAlign="center"
+				  verticalAlign="middle"
+				  visible="false"
+				  includeInLayout="false">
+			<s:Label id="selectedUserAcctID_L"
+					 text="Account ID:"
+					 visible="false"
+					 includeInLayout="false"/>
+			<s:TextInput id="selectedUserAcctID_TI"
+						 width="100%"
+						 visible="false"
+						 includeInLayout="false"/>
+		</s:HGroup>
+		
+		
+		<s:HGroup id="advancedView_propName"
+				  width="100%" horizontalAlign="center"
+				  verticalAlign="middle"
+				  visible="false"
+				  includeInLayout="false">
+			<s:Label id="propName_L"
+					 text="Property:"
+					 visible="false"
+					 includeInLayout="false"/>
+			<s:TextInput id="propName_TI"
+						 width="100%"
+						 visible="false"
+						 includeInLayout="false"/>
+		</s:HGroup>
+		
+		
+		<s:HGroup id="advancedView_propVal"
+				  width="100%" horizontalAlign="center"
+				  verticalAlign="middle"
+				  visible="false"
+				  includeInLayout="false">
+			<s:Label id="propVal_L"
+					 text="Value:"
+					 visible="false"
+					 includeInLayout="false"/>
+			<s:TextInput id="propVal_TI"
+						 width="100%"
+						 visible="false"
+						 includeInLayout="false"
+						 enabled="false"
+						 editable="false"/>
+		</s:HGroup>
+		
+		
+		<s:HGroup id="advancedView_editablePropVal_HG"
+				  width="100%" horizontalAlign="center"
+				  verticalAlign="middle"
+				  visible="false"
+				  includeInLayout="false">
+			<s:Label id="editablePropVal_L"
+					 text="Value:"
+					 visible="false"
+					 includeInLayout="false"/>
+			<s:TextInput id="editablePropVal_TI"
+						 width="100%"
+						 visible="false"
+						 includeInLayout="false"
+						 enabled="false"/>
+		</s:HGroup>
+		
+	<!--	
+	</s:Group>
+	-->
+	
+	
+	<s:VGroup id="adminTypeSelection_VG" 
+			  width="100%" 
+			  horizontalAlign="center"
+			  verticalAlign="middle"
+			  enabled="false">
+		
+		<!-- only viaible to super/global admins -->
+		<s:HGroup id="adminType_ga_Group" 
+				  width="100%" 
+				  horizontalAlign="center"
+				  verticalAlign="middle"
+				  visible="false"
+				  includeInLayout="false"
+				  enabled="false">
+			
+			<s:BitmapImage id="adminType_ga_Img" 
+						   height="15" width="15"
+						   visible="false"
+						   includeInLayout="false"/>
+			
+			<s:RadioButton id="adminType_ga_RB"
+						   label="Global Admin" value="ga" 
+						   groupName="selectedAdminType_RBG"
+						   visible="false"
+						   includeInLayout="false"/>
+			
+		</s:HGroup>
+		
+		
+		<s:HGroup id="adminType_rh_Group" 
+				  width="100%" 
+				  horizontalAlign="center"
+				  verticalAlign="middle"
+				  visible="false"
+				  includeInLayout="false"
+				  enabled="false">
+			
+			<s:BitmapImage id="adminType_rh_Img" 
+						   height="15" width="15"
+						   visible="false"
+						   includeInLayout="false"/>
+			
+			<s:RadioButton id="adminType_rh_RB"
+						   label="Room Host" value="rh" 
+						   groupName="selectedAdminType_RBG"
+						   visible="false"
+						   includeInLayout="false"/>
+			
+		</s:HGroup>
+		
+		
+		<!-- visible by default -->
+		<s:HGroup width="100%" 
+				  horizontalAlign="center"
+				  verticalAlign="middle">
+			
+			<s:BitmapImage id="adminType_ra_Img" 
+						   height="15" width="15"
+						   horizontalCenter="0" verticalCenter="0"/>
+			
+			<s:RadioButton id="adminType_ra_RB"
+						   label="Room Admin" value="ra" 
+						   groupName="selectedAdminType_RBG"/>
+			
+		</s:HGroup>
+		
+		
+		<s:HGroup width="100%" 
+				  horizontalAlign="center"
+				  verticalAlign="middle">
+			
+			<s:BitmapImage id="adminType_rm_Img" 
+						   height="15" width="15"
+						   horizontalCenter="0" verticalCenter="0"/>
+			
+			<s:RadioButton id="adminType_rm_RB"
+						   label="Room Moderator" value="rm" 
+						   groupName="selectedAdminType_RBG"/>
+			
+		</s:HGroup>
+		
+		
+		<s:HGroup width="100%" 
+				  horizontalAlign="center"
+				  verticalAlign="middle"
+				  enabled="false" 
+				  visible="false"
+				  includeInLayout="false">
+			
+			<s:BitmapImage id="adminType_vip_Img" 
+						   height="15" width="15"
+						   horizontalCenter="0" verticalCenter="0"/>
+			
+			
+			<s:RadioButton id="adminType_vip_RB"
+						   label="VIP" value="vip" 
+						   groupName="selectedAdminType_RBG"/>
+		</s:HGroup>
+		
+		
+		<s:HGroup width="100%" 
+				  horizontalAlign="center"
+				  verticalAlign="middle">
+			
+			<s:BitmapImage id="adminType_notadmin_Img" 
+						   height="15" width="15"
+						   horizontalCenter="0" verticalCenter="0"/>
+			
+			<s:RadioButton id="adminType_notadmin_RB"
+						   label="Not Admin" value="notadmin" 
+						   groupName="selectedAdminType_RBG"/>
+			
+		</s:HGroup>
+		
+	</s:VGroup>
+	
+	
+	
+	<s:Spacer height="20"/>
+	
+	
+	
+	<s:HGroup width="100%" 
+			  horizontalAlign="center"
+			  verticalAlign="middle">
+		<s:Label text="Admin Password:"/>
+		<s:TextInput id="adminPass_TI" 
+					 displayAsPassword="true"/>
+	</s:HGroup>
+	
+	
+	
+	<s:Spacer height="20"/>
+	
+	
+	
+	<!-- show advanced options -->
+	<s:CheckBox id="isAdvancedViewSelected_CB"
+				layoutDirection="ltr"
+				label="Advanced"
+				fontSize="12"
+				change="isAdvancedViewSelected_CB_changeHandler(event)"/>
+	
+	
+	
+	<!-- close/reset buttons -->
+	<s:HGroup width="100%" height="100%" 
+			  horizontalAlign="center"
+			  verticalAlign="middle">
+		
+		<s:Button id="okBtn" label="OK"
+				  click="okBtn_clickHandler(event)"/>
+		
+		<s:Button id="cancelBtn" label="Cancel"
+				  click="cancelBtn_clickHandler(event)"/>
+		
+	</s:HGroup>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+</s:TitleWindow>

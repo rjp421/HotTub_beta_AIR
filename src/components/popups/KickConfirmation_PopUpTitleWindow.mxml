@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+	xmlns:s="library://ns.adobe.com/flex/spark" 
+	xmlns:mx="library://ns.adobe.com/flex/mx" 
+	close="handleCloseEvent()" 
+	creationComplete="creationCompleteHandler(event)"
+	width="260" height="240"
+	title="Kick User?" backgroundColor="#249F18">
+	
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	
+	<s:layout>
+		<s:VerticalLayout/>
+	</s:layout>
+	
+	
+	<fx:Script>
+		<![CDATA[
+			import events.CustomEvent;
+			import mx.events.FlexEvent;
+			import mx.managers.PopUpManager;
+			
+			
+			private var cmdObj:Object = new Object();
+			
+			// Handle the close button and Cancel button.
+			private function handleCloseEvent():void
+			{
+				cmdObj = null;
+				parentApplication.lobby.userListPanel.popUpMenu = null;
+				parentApplication.lobby.openPopUps_AC.removeItemAt(parentApplication.lobby.openPopUps_AC.getItemIndex(this));
+				PopUpManager.removePopUp(this);
+			}
+			
+			protected function creationCompleteHandler(event:FlexEvent):void
+			{
+				// set the title bar text style
+				/*this.titleDisplay.setStyle("color", 0xFFFFFF);
+				this.titleDisplay.setStyle("textAlign", "center");
+				this.titleDisplay.setStyle("fontSize", 12);
+				this.titleDisplay.setStyle("fontType", "bold");
+				this.titleDisplay.setStyle("fontFamily", "Verdana");*/
+				parentApplication.lobby.openPopUps_AC.addItem(this);
+				
+				PopUpManager.centerPopUp(this);
+				
+				kickConfirm_T.text = "Are you sure you want to kick "+parentApplication.lobby.userListPanel.userList_DG.selectedItem.userName+"?";
+				
+				cmdObj.clientID = parentApplication.lobby.mediaManager.clientID;
+				cmdObj.acctID = parentApplication.lobby.mediaManager.acctID;
+				cmdObj.userID = parentApplication.lobby.mediaManager.userID;
+				cmdObj.userName = parentApplication.lobby.mediaManager.userName;
+				cmdObj.roomName = parentApplication.loginPanel.roomName_TI.text;
+				
+				cmdObj.selectedUserAcctID = parentApplication.lobby.userListPanel.userList_DG.selectedItem.acctID;
+				cmdObj.selectedUserID = parentApplication.lobby.userListPanel.userList_DG.selectedItem.userID;
+				cmdObj.selectedUserName = parentApplication.lobby.userListPanel.userList_DG.selectedItem.userName;
+				cmdObj.cmd = "kick";
+				
+				event = null;
+			}
+			
+			protected function cancelBtn_clickHandler(event:MouseEvent):void
+			{
+				handleCloseEvent();
+				event = null;
+			}
+			
+			protected function kickBtn_clickHandler(event:MouseEvent):void
+			{
+				cmdObj.reason = kickReason_TI.text;
+				parentApplication.loginPanel.nc.call("adminManager.adminCmd",null,cmdObj);
+				handleCloseEvent();
+				event = null;
+			}
+			
+			
+			
+		]]>
+	</fx:Script>
+	
+	<s:VGroup
+		verticalCenter="-15"
+		horizontalCenter="0"
+		verticalAlign="middle" 
+		horizontalAlign="center"
+		width="260" height="210">
+		
+		<s:Label id="kickConfirm_T" 
+			color="#FFFFFF" 
+			width="260"
+			fontFamily="Verdana"
+			fontWeight="bold"
+			fontSize="14"
+			textAlign="center"/>
+		
+		<s:Label text="Reason:"
+			paddingTop="5"
+			fontFamily="Verdana"
+			fontWeight="bold"
+			fontSize="14"
+			color="#FFFFFF"
+			textAlign="center"/>
+		
+		<s:TextInput id="kickReason_TI" 
+			width="220" height="50" 
+			textAlign="center"
+			color="#FFFFFF"
+			contentBackgroundColor="#009900"/>
+		
+		<s:HGroup>
+			
+			<s:Button id="kickBtn" 
+				label="Kick"
+				click="kickBtn_clickHandler(event)" color="#FFFFFF"/>
+			<s:Button id="cancelBtn"
+				label="Cancel"
+				click="cancelBtn_clickHandler(event)" color="#FFFFFF"/>
+			
+		</s:HGroup>
+		
+	</s:VGroup>
+	
+	
+</s:TitleWindow>

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:VGroup xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		  xmlns:s="library://ns.adobe.com/flex/spark" 
+		  xmlns:mx="library://ns.adobe.com/flex/mx"
+		  xmlns:components="components.*"
+		  xmlns:chat="components.chat.*"
+		  creationComplete="chatPanelCreationCompleteHandler(event)"
+		  width="655" height="370" gap="0" 
+		  horizontalAlign="center" 
+		  verticalAlign="middle">
+	
+	
+	<fx:Script>
+		<![CDATA[
+			import me.whohacked.app.IconManager_Singleton;
+		]]>
+	</fx:Script>
+	
+	
+	
+	<!-- FILTERS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	<!--
+	<s:filters>
+	<s:DropShadowFilter 
+	alpha="1"
+	angle="45"
+	color="0x000000"
+	distance="2"
+	hideObject="false"
+	inner="false"/>
+	</s:filters>
+	-->	
+	
+	<!-- STATES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	<!--	
+	<s:states>
+	</s:states>
+	-->	
+	
+	<!-- METADATA ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	
+	
+	<!-- SCRIPTS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	
+	<fx:Script source="../../scripts/ChatPanel.as"/>
+	
+	
+	<!-- DECLARATIONS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (services, value objects, etc) here -->
+	</fx:Declarations>
+	
+	
+	
+	<!-- UI COMPONENTS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	
+	
+	<!--text output-->
+	<chat:ChatTextArea id="chatTextArea" 
+					   width="100%" height="100%"/>
+	
+	
+	<!--text input and font/cam controls-->
+	<s:VGroup width="100%" height="55" gap="2" 
+			  horizontalAlign="center" 
+			  verticalAlign="middle">
+		
+		
+		<s:HGroup width="100%" height="25" 
+				  horizontalAlign="center" 
+				  verticalAlign="middle">
+			
+			<chat:FontControlBar id="fontControlBar"
+								 width="160" height="100%"
+								 left="0"/>
+			
+			<components:CamControlBar id="camControlBar"
+									  width="100%" height="100%"/>
+			
+			<s:Button id="refillEmptyCams_Btn"
+					  width="30" height="25"
+					  useHandCursor="true" 
+					  icon="{IconManager_Singleton.getInstance().getIcon('app_refillCams')}"
+					  click="parentApplication.lobby.autoDockCams()"
+					  toolTip="Refills all empty cam spots with a new user."/>
+			
+			<s:Button id="logoutBtn"
+					  width="70" height="100%"
+					  label="Logout" right="0" 
+					  click="parentApplication.loginPanel.disconnect()"/>
+<!--					  icon="{IconManager_Singleton.getInstance().getIcon('app_door_out')}"
+-->			
+		</s:HGroup>
+		
+		
+		<chat:ChatTextInput id="chatTextInput"
+							width="100%" height="25"/>
+		
+		
+	</s:VGroup>
+	
+	
+	
+	
+	
+	
+</s:VGroup>

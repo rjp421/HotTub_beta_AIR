@@ -1,0 +1,375 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+	xmlns:s="library://ns.adobe.com/flex/spark" 
+	xmlns:mx="library://ns.adobe.com/flex/mx" 
+	title="Current Bans" backgroundColor="#249F18" 
+	width="650" height="350" 
+	close="handleCloseEvent()" 
+	creationComplete="creationCompleteHandler(event)"
+	windowMoving="titleWin_windowMovingHandler(event)">
+	
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	
+	<s:layout>
+		<s:VerticalLayout/>
+	</s:layout>
+
+<!--
+	<s:states>
+		<s:State name="mainState"/>
+		<s:State name="banListState"/>
+	</s:states>
+-->
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import mx.events.FlexEvent;
+			import mx.events.ListEvent;
+			import mx.managers.PopUpManager;
+			
+			import spark.events.TitleWindowBoundsEvent;
+			
+			import events.CustomEvent;
+			
+			
+			[Bindable]
+			private var bannedUsers_DP:ArrayCollection = new ArrayCollection();
+			[Bindable]
+			private var bannedIPs_DP:ArrayCollection = new ArrayCollection();
+			private var cmdObj:Object = new Object();
+			private var bannedUsersObj:Object;
+			
+			// Handle the close button and Cancel button.
+			private function handleCloseEvent():void
+			{
+				bannedUsers_DP.removeAll();
+				bannedIPs_DP.removeAll();
+				bannedUsers_DP = null;
+				bannedIPs_DP = null;
+				cmdObj = null;
+				parentApplication.lobby.openPopUps_AC.removeItemAt(parentApplication.lobby.openPopUps_AC.getItemIndex(this));
+				PopUpManager.removePopUp(this);
+			}
+			
+			protected function creationCompleteHandler(event:FlexEvent):void
+			{
+				// set the title bar text style
+				/*this.titleDisplay.setStyle("color", 0xFFFFFF);
+				this.titleDisplay.setStyle("textAlign", "center");
+				this.titleDisplay.setStyle("fontSize", 12);
+				this.titleDisplay.setStyle("fontType", "bold");
+				this.titleDisplay.setStyle("fontFamily", "Verdana");*/
+				// set the tabs text style
+				banList_TN.setStyle("color", 0xFFFFFF);
+				banList_TN.setStyle("textAlign", "center");
+				banList_TN.setStyle("fontSize", 12);
+				banList_TN.setStyle("fontType", "bold");
+				banList_TN.setStyle("fontFamily", "Verdana");
+				this.id = "banList_TW";
+				bannedUsersObj = parentApplication.lobby.tmpObj;
+				receiveBannedUsers();
+				parentApplication.lobby.openPopUps_AC.addItem(this);
+				PopUpManager.centerPopUp(this);
+				cmdObj.userID = parentApplication.lobby.mediaManager.userID;
+				parentApplication.lobby.tmpObj = null;
+				event = null;
+			}
+			
+			protected function closeBtn_clickHandler(event:MouseEvent):void
+			{
+				handleCloseEvent();
+				event = null;
+			}
+			
+			public function receiveBannedUsers():void
+			{
+				for (var i:Object in bannedUsersObj)
+				{
+					trace("BanList.receiveBannedUsers>  i: "+i+"  bannedUsersObj[i]: "+bannedUsersObj[i]);
+					if (i.toString().split("_")[0] == "BAN")
+					{
+						bannedUsers_DP.addItem(bannedUsersObj[i]);
+					}
+					if (i.toString().split("_")[0] == "BANNEDIP")
+					{
+						bannedIPs_DP.addItem(bannedUsersObj[i]);
+					}
+				}
+				i = null;
+				bannedUsersObj = null;
+			}
+			
+			protected function bannedUsers_DG_itemClickHandler(event:ListEvent):void
+			{
+				userName_TA.text = bannedUsers_DG.selectedItem.username;
+				userIP_TA.text = bannedUsers_DG.selectedItem.ip;
+				adminName_TA.text = bannedUsers_DG.selectedItem.adminname;
+				banDate_TA.text = bannedUsers_DG.selectedItem.banDate;
+				banReason_TA.text = bannedUsers_DG.selectedItem.reason;
+				unbanBtn.enabled = true;
+				event = null;
+			}
+			
+			protected function bannedIPs_DG_itemClickHandler(event:ListEvent):void
+			{
+				userName_TA.text = "--";
+				switch (bannedIPs_DG.selectedItem.ip.length)
+				{
+					case 4 :
+						userIP_TA.text = bannedIPs_DG.selectedItem.ip[0]+"."+bannedIPs_DG.selectedItem.ip[1]+"."+bannedIPs_DG.selectedItem.ip[2]+"."+bannedIPs_DG.selectedItem.ip[3];
+					break;
+					case 3 :
+						userIP_TA.text = bannedIPs_DG.selectedItem.ip[0]+"."+bannedIPs_DG.selectedItem.ip[1]+"."+bannedIPs_DG.selectedItem.ip[2]+".0";
+					break;
+					case 2 :
+						userIP_TA.text = bannedIPs_DG.selectedItem.ip[0]+"."+bannedIPs_DG.selectedItem.ip[1]+".0.0";
+					break;
+					case 1 :
+						userIP_TA.text = bannedIPs_DG.selectedItem.ip[0]+".0.0.0";
+					break;
+				}
+				adminName_TA.text = bannedIPs_DG.selectedItem.adminname;
+				banDate_TA.text = bannedIPs_DG.selectedItem.banDate;
+				banReason_TA.text = bannedIPs_DG.selectedItem.reason;
+				unbanBtn.enabled = true;
+				event = null;
+			}
+
+			protected function unbanBtn_clickHandler(event:MouseEvent):void
+			{
+				//trace("BanList.unbanBtn_clickHandler>  banList_TN.selectedChild: "+banList_TN.selectedChild+"  banList_TN.selectedIndex: "+banList_TN.selectedIndex);
+				
+				cmdObj.clientID = parentApplication.lobby.mediaManager.clientID;
+				cmdObj.acctID = parentApplication.lobby.mediaManager.acctID;
+				cmdObj.userID = parentApplication.lobby.mediaManager.userID;
+				cmdObj.userName = parentApplication.lobby.mediaManager.userName;
+				cmdObj.roomName = parentApplication.loginPanel.roomName_TI.text;
+				
+				if (banList_TN.selectedIndex == 0)
+				{
+					trace("BanList.unbanBtn_clickHandler>  TAB 1 = selectedIndex: "+banList_TN.selectedIndex+"  ip: "+bannedUsers_DG.selectedItem.ip);
+					// Tab 1 - User Bans
+					cmdObj.cmd = "unban "+bannedUsers_DG.selectedItem.ip.toString();
+					parentApplication.loginPanel.nc.call("adminManager.adminCmd",null,cmdObj);
+					for (var i:Object in bannedUsers_DP)
+					{
+						if (bannedUsers_DP[i].ip == bannedUsers_DG.selectedItem.ip)
+						{
+							bannedUsers_DP.removeItemAt(bannedUsers_DP.getItemIndex(bannedUsers_DP[i]));
+							bannedUsers_DG.invalidateList();
+							break;
+						}
+					}
+					i = null;
+				} else if (banList_TN.selectedIndex == 1)
+				{
+					trace("BanList.unbanBtn_clickHandler>  TAB 2 - selectedIndex: "+banList_TN.selectedIndex+"  ip: "+bannedIPs_DG.selectedItem.ip);
+					// Tab 2 - IP Bans
+					switch (bannedIPs_DG.selectedItem.ip.length)
+					{
+						case 4 :
+							cmdObj.cmd = "unbanip "+bannedIPs_DG.selectedItem.ip[0]+"."+bannedIPs_DG.selectedItem.ip[1]+"."+bannedIPs_DG.selectedItem.ip[2]+"."+bannedIPs_DG.selectedItem.ip[3];
+						break;
+						case 3 :
+							cmdObj.cmd = "unbanip "+bannedIPs_DG.selectedItem.ip[0]+"."+bannedIPs_DG.selectedItem.ip[1]+"."+bannedIPs_DG.selectedItem.ip[2]+".0";
+						break;
+						case 2 :
+							cmdObj.cmd = "unbanip "+bannedIPs_DG.selectedItem.ip[0]+"."+bannedIPs_DG.selectedItem.ip[1]+".0.0";
+						break;
+						case 1 :
+							cmdObj.cmd = "unbanip "+bannedIPs_DG.selectedItem.ip[0]+".0.0.0";
+						break;
+					}
+					parentApplication.loginPanel.nc.call("adminManager.adminCmd",null,cmdObj);
+					for (var x:Object in bannedIPs_DP)
+					{
+						if (bannedIPs_DP[x].ip == bannedIPs_DG.selectedItem.ip)
+						{
+							bannedIPs_DP.removeItemAt(bannedIPs_DP.getItemIndex(bannedIPs_DP[x]));
+							bannedIPs_DG.invalidateList();
+							break;
+						}
+					}
+					x = null;
+				} else if (banList_TN.selectedIndex == 2)
+				{
+					trace("BanList.unbanBtn_clickHandler>  TAB 3 - selectedIndex: "+banList_TN.selectedIndex+"  ip: "+bannedIPs_DG.selectedItem.ip);
+					// Tab 3 - Ban User/IP
+					//parentApplication.loginPanel.nc.call("adminManager.adminCmd",null,cmdObj);
+				}
+				event = null;
+			}
+			
+			
+			
+			private function titleWin_windowMovingHandler(event:TitleWindowBoundsEvent):void
+			{
+				if (event.afterBounds.left < 0) {
+					event.afterBounds.left = 0;
+				} else if (event.afterBounds.right > systemManager.stage.stageWidth) {
+					event.afterBounds.left = systemManager.stage.stageWidth - event.afterBounds.width;
+				}
+				if (event.afterBounds.top < 0) {
+					event.afterBounds.top = 0;
+				} else if (event.afterBounds.bottom > systemManager.stage.stageHeight) {
+					event.afterBounds.top = systemManager.stage.stageHeight - event.afterBounds.height;
+				}
+				
+				event = null;
+			}
+			
+			
+			
+			
+			
+		]]>
+	</fx:Script>
+	
+	
+	<s:VGroup horizontalAlign="center"
+		horizontalCenter="0" verticalCenter="-15" height="320">
+		<s:HGroup height="290">
+				
+			<mx:TabNavigator id="banList_TN"
+				width="300" height="290"
+				backgroundColor="#009900" 
+				horizontalCenter="0" verticalCenter="0">
+				
+				<s:NavigatorContent id="bannedUsersTab"
+					label="User Bans" 
+					width="300" height="290" 
+					color="#FFFFFF" 
+					fontWeight="bold">
+					
+					<mx:DataGrid id="bannedUsers_DG"
+						width="300" height="257" 
+						rowHeight="20"
+						color="#FFFFFF"
+						selectionColor="#19B819"
+						alternatingItemColors="#009900"
+						contentBackgroundColor="#009900"
+						contentBackgroundAlpha="0.9"
+						dataProvider="{bannedUsers_DP}"
+						itemClick="bannedUsers_DG_itemClickHandler(event)">
+						<mx:columns>
+							<mx:DataGridColumn width="15"
+								backgroundColor="#009900"/>
+							<mx:DataGridColumn width="140"
+								backgroundColor="#009900"
+								dataField="username" 
+								headerText="Username" 
+								textAlign="left"/>
+							<mx:DataGridColumn 
+								backgroundColor="#009900"
+								dataField="ip" 
+								headerText="IP" 
+								textAlign="left"/>
+						</mx:columns>
+					</mx:DataGrid>
+					
+				</s:NavigatorContent>
+				<s:NavigatorContent id="bannedIPsTab" 
+					label="IP Bans" 
+					width="300" height="290" 
+					color="#FFFFFF" 
+					fontWeight="bold">
+					
+					<mx:DataGrid id="bannedIPs_DG"
+						width="300" height="290"
+						rowHeight="20"
+						color="#FFFFFF"
+						selectionColor="#19B819"
+						alternatingItemColors="#009900"
+						contentBackgroundColor="#009900"
+						contentBackgroundAlpha="0.9"
+						dataProvider="{bannedIPs_DP}"
+						itemClick="bannedIPs_DG_itemClickHandler(event)">
+						<mx:columns>
+							<mx:DataGridColumn width="15"
+								backgroundColor="#009900"/>
+							<mx:DataGridColumn 
+								backgroundColor="#009900"
+								dataField="ip" 
+								headerText="IP Range" 
+								textAlign="left"/>
+						</mx:columns>
+					</mx:DataGrid>
+					
+				</s:NavigatorContent>
+				
+			</mx:TabNavigator>
+			
+			<s:VGroup width="340" height="350"
+				paddingTop="5" gap="2">
+				<s:Label width="340" height="20"
+					text="User Name:" color="#FFFFFF"
+					verticalAlign="middle" textAlign="left"/>
+				<s:TextArea id="userName_TA"
+					width="340" height="20"
+					verticalAlign="middle" textAlign="left"
+					fontWeight="bold"
+					color="#FFFFFF" contentBackgroundColor="#00D000"
+					enabled="false"/>
+				<s:Label width="340" height="20"
+					text="User IP:" color="#FFFFFF"
+					verticalAlign="middle" textAlign="left"/>
+				<s:TextArea id="userIP_TA"
+					width="340" height="20"
+					verticalAlign="middle" textAlign="left"
+					fontWeight="bold"
+					color="#FFFFFF" contentBackgroundColor="#00D000"
+					enabled="false"/>
+				<s:Label width="340" height="20"
+					text="Banned by:" color="#FFFFFF"
+					verticalAlign="middle" textAlign="left"/>
+				<s:TextArea id="adminName_TA"
+					width="340" height="20"
+					verticalAlign="middle" textAlign="left"
+					fontWeight="bold"
+					color="#FFFFFF" contentBackgroundColor="#00D000"
+					enabled="false"/>
+				<s:Label width="340" height="20"
+					text="Date:" color="#FFFFFF"
+					verticalAlign="middle" textAlign="left"/>
+				<s:TextArea id="banDate_TA"
+					width="340" height="20"
+					verticalAlign="middle" textAlign="left"
+					fontWeight="bold"
+					color="#FFFFFF" contentBackgroundColor="#00D000"
+					enabled="false"/>
+				<s:Label width="340" height="20"
+					text="Reason:" color="#FFFFFF"
+					verticalAlign="middle" textAlign="left"/>
+				<s:TextArea id="banReason_TA"
+					width="340" height="85"
+					verticalAlign="top" textAlign="left"
+					fontWeight="bold"
+					color="#FFFFFF" contentBackgroundColor="#00D000"
+					enabled="false"/>
+			</s:VGroup>
+			
+		</s:HGroup>
+		
+		<s:HGroup>
+			
+			<s:Button id="unbanBtn"
+				label="Unban"
+				enabled="false"
+				color="#FFFFFF"
+				click="unbanBtn_clickHandler(event)"/>
+			
+			<s:Button id="closeBtn"
+				label="Close"
+				click="closeBtn_clickHandler(event)" 
+				color="#FFFFFF"/>
+			
+		</s:HGroup>
+		
+	</s:VGroup>
+	
+</s:TitleWindow>

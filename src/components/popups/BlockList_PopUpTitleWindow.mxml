@@ -1,0 +1,449 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" 
+			   title="Current Blocks" backgroundColor="#249F18" 
+			   minWidth="750" minHeight="450" 
+			   close="handleCloseEvent()" 
+			   creationComplete="creationCompleteHandler(event)"
+			   windowMoving="titleWin_windowMovingHandler(event)">
+	
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	
+	<s:layout>
+		<s:VerticalLayout/>
+	</s:layout>
+	
+	<!--
+	<s:states>
+	<s:State name="mainState"/>
+	<s:State name="banListState"/>
+	</s:states>
+	-->
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import mx.events.FlexEvent;
+			import mx.events.ListEvent;
+			import mx.managers.PopUpManager;
+			import mx.utils.ObjectProxy;
+			import mx.utils.ObjectUtil;
+			
+			import spark.events.TitleWindowBoundsEvent;
+			
+			import events.CustomEvent;
+			
+			import me.whohacked.app.AppWide_Singleton;
+			
+			
+			private var cmdObj:Object = new Object();
+			private var blockedUsersObj:Object;
+			
+			[Bindable]
+			private var blockedUsers_DP:ArrayCollection = new ArrayCollection();
+			
+			
+			
+			
+			protected function creationCompleteHandler(event:FlexEvent):void
+			{
+				// set the title bar text style
+				/*this.titleDisplay.setStyle("color", 0xFFFFFF);
+				this.titleDisplay.setStyle("textAlign", "center");
+				this.titleDisplay.setStyle("fontSize", 12);
+				this.titleDisplay.setStyle("fontType", "bold");
+				this.titleDisplay.setStyle("fontFamily", "Verdana");
+				// set the tabs text style
+				blockList_TN.setStyle("color", 0xFFFFFF);
+				blockList_TN.setStyle("textAlign", "center");
+				blockList_TN.setStyle("fontSize", 12);
+				blockList_TN.setStyle("fontType", "bold");
+				blockList_TN.setStyle("fontFamily", "Verdana");*/
+				
+				this.id = "blockList_TW";
+				
+				//blockedUsersObj = parentApplication.lobby.tmpObj;
+				blockedUsersObj = AppWide_Singleton.getInstance().userInfoObj.ignores;
+				
+				receiveBlockedUsers();
+				
+				parentApplication.lobby.openPopUps_AC.addItem(this);
+				
+				PopUpManager.centerPopUp(this);
+				
+				cmdObj.clientID = parentApplication.lobby.mediaManager.clientID;
+				cmdObj.acctID = parentApplication.lobby.mediaManager.acctID;
+				cmdObj.userID = parentApplication.lobby.mediaManager.userID;
+				cmdObj.userName = parentApplication.lobby.mediaManager.userName;
+				cmdObj.roomName = parentApplication.loginPanel.roomName_TI.text;
+				
+				parentApplication.lobby.tmpObj = null;
+				event = null;
+			}
+			
+			
+			public function receiveBlockedUsers():void
+			{
+				trace("BlockList.receiveBlockedUsers>  " + blockedUsersObj);
+				
+				for (var i:* in blockedUsersObj)
+				{
+					trace("BlockList.receiveBlockedUsers>  i: "+i+"  blockedUsersObj[i]: "+blockedUsersObj[i]);
+					
+					AppWide_Singleton.getInstance().userInfoObj.ignores[i] = blockedUsersObj[i];
+					
+					blockedUsers_DP.addItem(blockedUsersObj[i]);
+					
+					/*
+					if (i.toString().split("_")[0] == "BAN")
+					{
+						blockedUsers_DP.addItem(blockedUsersObj[i]);
+					}
+					if (i.toString().split("_")[0] == "BANNEDIP")
+					{
+						bannedIPs_DP.addItem(blockedUsersObj[i]);
+					}
+					*/
+				}
+				
+				blockedUsers_DP.refresh();
+				blockedUsers_DG.invalidateList();
+				
+				trace("BlockList.receiveBlockedUsers>" + (i == undefined ? "" : "  i: " + i + "  blockedUsersObj[i]: " + blockedUsersObj[i]) + "  blockedUsers_DP.length: " + blockedUsers_DP.length);
+				
+				i = null;
+				blockedUsersObj = null;
+			}
+			
+			
+			protected function blockedUsers_DG_itemClickHandler(event:ListEvent):void
+			{
+				whoIgnoredName_TA.text = blockedUsers_DG.selectedItem.whoIgnoredName;
+				whoIgnoredAcctID_TA.text = blockedUsers_DG.selectedItem.whoIgnoredAcctID;
+				whoIgnoredID_TA.text = blockedUsers_DG.selectedItem.whoIgnoredID;
+				ignoredWhoName_TA.text = blockedUsers_DG.selectedItem.ignoredWhoName;
+				ignoredWhoAcctID_TA.text = blockedUsers_DG.selectedItem.ignoredWhoAcctID;
+				ignoredWhoID_TA.text = blockedUsers_DG.selectedItem.ignoredWhoID;
+				blockDate_TA.text = blockedUsers_DG.selectedItem.ignoreDate ? blockedUsers_DG.selectedItem.ignoreDate : "--";
+				
+				unblockBtn.enabled = true;
+				event = null;
+			}
+			
+			
+			protected function unblockBtn_clickHandler(event:MouseEvent):void
+			{
+				//trace("BlockList.unblockBtn_clickHandler>  banList_TN.selectedChild: "+banList_TN.selectedChild+"  banList_TN.selectedIndex: "+banList_TN.selectedIndex);
+				
+				whoIgnoredName_TA.text = "--";
+				whoIgnoredAcctID_TA.text = "--";
+				whoIgnoredID_TA.text = "--";
+				ignoredWhoName_TA.text = "--";
+				ignoredWhoAcctID_TA.text = "--";
+				ignoredWhoID_TA.text = "--";
+				blockDate_TA.text = "--";
+				
+				unblockBtn.enabled = false;
+				
+				cmdObj.cmd = "unignore";
+				cmdObj.clientID = parentApplication.lobby.mediaManager.clientID;
+				cmdObj.acctID = parentApplication.lobby.mediaManager.acctID;
+				cmdObj.userID = parentApplication.lobby.mediaManager.userID;
+				cmdObj.userName = parentApplication.lobby.mediaManager.userName;
+				cmdObj.roomName = parentApplication.loginPanel.roomName_TI.text;
+				cmdObj.selectedUserName = blockedUsers_DG.selectedItem.ignoredWhoName;
+				cmdObj.ignoreInfo = blockedUsers_DG.selectedItem;
+				
+				parentApplication.loginPanel.nc.call("adminCmd", null, cmdObj);
+				//parentApplication.loginPanel.nc.call("adminManager.unignoreUser", null, cmdObj);
+				
+				//var nodeName:String = (blockedUsers_DG.selectedItem.ignoredWhoAcctID==0) ? "guest_"+blockedUsers_DG.selectedItem.ignoredWhoName : "member_"+blockedUsers_DG.selectedItem.ignoredWhoAcctID;
+				//var appWideSingleton:AppWide_Singleton = AppWide_Singleton.getInstance();
+				
+				//appWideSingleton.userInfoObj.removeItemAt(appWideSingleton.userInfoObj.ignores.getItemIndex(blockedUsers_DG.selectedItem));
+				
+				parentApplication.loginPanel.nc.client.dispatchEvent(new CustomEvent("unignoredUser", false, false, cmdObj.ignoreInfo));
+				
+				blockedUsers_DP.removeItem(blockedUsers_DG.selectedItem);
+				
+				blockedUsers_DP.refresh();
+				blockedUsers_DG.invalidateList();
+				
+				//appWideSingleton = null;
+				//nodeName = null;
+				
+				//for (var i:Object in parentApplication.lobby.userListPanel.userList_DP)
+				
+				/*
+				if (blockList_TN.selectedIndex == 0)
+				{
+					trace("BlockList.unblockBtn_clickHandler>  TAB 1 = selectedIndex: "+blockList_TN.selectedIndex+"  ip: "+blockedUsers_DG.selectedItem.ip);
+					// Tab 1 - User Bans
+					cmdObj.cmd = "unban "+blockedUsers_DG.selectedItem.ip.toString();
+					parentApplication.loginPanel.nc.call("adminManager.adminCmd",null,cmdObj);
+					for (var i:Object in blockedUsers_DP)
+					{
+						if (blockedUsers_DP[i].ip == blockedUsers_DG.selectedItem.ip)
+						{
+							blockedUsers_DP.removeItemAt(blockedUsers_DP.getItemIndex(blockedUsers_DP[i]));
+							blockedUsers_DG.invalidateList();
+							break;
+						}
+					}
+					i = null;
+				} else if (blockList_TN.selectedIndex == 1)
+				{
+					trace("BlockList.unblockBtn_clickHandler>  TAB 2 - selectedIndex: "+blockList_TN.selectedIndex+"  ip: "+bannedIPs_DG.selectedItem.ip);
+					// Tab 2 - IP Bans
+					switch (bannedIPs_DG.selectedItem.ip.length)
+					{
+						case 4 :
+							cmdObj.cmd = "unbanip "+bannedIPs_DG.selectedItem.ip[0]+"."+bannedIPs_DG.selectedItem.ip[1]+"."+bannedIPs_DG.selectedItem.ip[2]+"."+bannedIPs_DG.selectedItem.ip[3];
+							break;
+						case 3 :
+							cmdObj.cmd = "unbanip "+bannedIPs_DG.selectedItem.ip[0]+"."+bannedIPs_DG.selectedItem.ip[1]+"."+bannedIPs_DG.selectedItem.ip[2]+".0";
+							break;
+						case 2 :
+							cmdObj.cmd = "unbanip "+bannedIPs_DG.selectedItem.ip[0]+"."+bannedIPs_DG.selectedItem.ip[1]+".0.0";
+							break;
+						case 1 :
+							cmdObj.cmd = "unbanip "+bannedIPs_DG.selectedItem.ip[0]+".0.0.0";
+							break;
+					}
+					parentApplication.loginPanel.nc.call("adminManager.adminCmd",null,cmdObj);
+					for (var x:Object in bannedIPs_DP)
+					{
+						if (bannedIPs_DP[x].ip == bannedIPs_DG.selectedItem.ip)
+						{
+							bannedIPs_DP.removeItemAt(bannedIPs_DP.getItemIndex(bannedIPs_DP[x]));
+							bannedIPs_DG.invalidateList();
+							break;
+						}
+					}
+					x = null;
+				} else if (blockList_TN.selectedIndex == 2)
+				{
+					trace("BlockList.unblockBtn_clickHandler>  TAB 3 - selectedIndex: "+blockList_TN.selectedIndex+"  ip: "+bannedIPs_DG.selectedItem.ip);
+					// Tab 3 - Ban User/IP
+					//parentApplication.loginPanel.nc.call("adminManager.adminCmd",null,cmdObj);
+				}*/
+				event = null;
+			}
+			
+			
+			protected function closeBtn_clickHandler(event:MouseEvent):void
+			{
+				handleCloseEvent();
+				event = null;
+			}
+			
+			
+			// Handle the close button and Cancel button.
+			private function handleCloseEvent():void
+			{
+				parentApplication.lobby.openPopUps_AC.removeItemAt(parentApplication.lobby.openPopUps_AC.getItemIndex(this));
+				
+				blockedUsers_DP.removeAll();
+				//bannedIPs_DP.removeAll();
+				
+				cmdObj = null;
+				blockedUsers_DP = null;
+				//bannedIPs_DP = null;
+				
+				PopUpManager.removePopUp(this);
+			}
+			
+			
+			private function titleWin_windowMovingHandler(event:TitleWindowBoundsEvent):void
+			{
+				if (event.afterBounds.left < 0) {
+					event.afterBounds.left = 0;
+				} else if (event.afterBounds.right > systemManager.stage.stageWidth) {
+					event.afterBounds.left = systemManager.stage.stageWidth - event.afterBounds.width;
+				}
+				if (event.afterBounds.top < 0) {
+					event.afterBounds.top = 0;
+				} else if (event.afterBounds.bottom > systemManager.stage.stageHeight) {
+					event.afterBounds.top = systemManager.stage.stageHeight - event.afterBounds.height;
+				}
+				
+				event = null;
+			}
+			
+			
+			
+			
+			
+			
+			
+			
+		]]>
+	</fx:Script>
+	
+	
+	<s:VGroup horizontalAlign="center"
+			  horizontalCenter="0" verticalCenter="-15" 
+			  width="100%" height="100%">
+		<s:HGroup width="100%" height="100%">
+			
+					<!--
+			<mx:TabNavigator id="blockList_TN"
+							 width="100%" height="100%"
+							 opaqueBackground="#009900" 
+							 horizontalCenter="0" verticalCenter="0">
+				
+				<s:NavigatorContent id="blockedUsersTab"
+									label="Blocked Users" 
+									width="100%" height="100%" 
+									color="#FFFFFF" 
+									fontWeight="bold">
+					-->
+			
+					<mx:DataGrid id="blockedUsers_DG"
+								 width="100%" height="100%" 
+								 rowHeight="25"
+								 color="#FFFFFF"
+								 selectionColor="#19B819"
+								 alternatingItemColors="#009900"
+								 contentBackgroundColor="#009900"
+								 contentBackgroundAlpha="0.9"
+								 dataProvider="{blockedUsers_DP}"
+								 itemClick="blockedUsers_DG_itemClickHandler(event)">
+						<mx:columns>
+							<mx:DataGridColumn backgroundColor="#009900"
+											   dataField="whoIgnoredName" 
+											   headerText="whoIgnoredName" 
+											   textAlign="left"/>
+							<mx:DataGridColumn backgroundColor="#009900"
+											   dataField="ignoredWhoName" 
+											   headerText="ignoredWhoName" 
+											   textAlign="left"/>
+						</mx:columns>
+					</mx:DataGrid>
+					<!--
+				</s:NavigatorContent>
+				
+			</mx:TabNavigator>
+			-->
+			
+			<s:VGroup width="240" height="100%"
+					  paddingTop="5" paddingBottom="5" 
+					  paddingLeft="5" paddingRight="5" 
+					  gap="2"
+					  horizontalAlign="center"
+					  verticalAlign="middle">
+				
+				<s:Label width="100%" height="20"
+						 text="whoIgnoredName:" color="#FFFFFF"
+						 verticalAlign="middle" textAlign="left"/>
+				<s:TextArea id="whoIgnoredName_TA"
+							width="100%" height="20"
+							verticalAlign="middle" textAlign="left"
+							fontWeight="bold"
+							color="#FFFFFF" contentBackgroundColor="#00D000"
+							enabled="false"
+							editable="false"/>
+				
+				<s:Label width="100%" height="20"
+						 text="whoIgnoredAcctID:" color="#FFFFFF"
+						 verticalAlign="middle" textAlign="left"/>
+				<s:TextArea id="whoIgnoredAcctID_TA"
+							width="100%" height="20"
+							verticalAlign="middle" textAlign="left"
+							fontWeight="bold"
+							color="#FFFFFF" contentBackgroundColor="#00D000"
+							enabled="false"
+							editable="false"/>
+				
+				<s:Label width="100%" height="20"
+						 text="whoIgnoredID:" color="#FFFFFF"
+						 verticalAlign="middle" textAlign="left"/>
+				<s:TextArea id="whoIgnoredID_TA"
+							width="100%" height="20"
+							verticalAlign="middle" textAlign="left"
+							fontWeight="bold"
+							color="#FFFFFF" contentBackgroundColor="#00D000"
+							enabled="false"
+							editable="false"/>
+				
+				<s:Label width="100%" height="20"
+						 text="ignoredWhoName:" color="#FFFFFF"
+						 verticalAlign="middle" textAlign="left"/>
+				<s:TextArea id="ignoredWhoName_TA"
+							width="100%" height="20"
+							verticalAlign="middle" textAlign="left"
+							fontWeight="bold"
+							color="#FFFFFF" contentBackgroundColor="#00D000"
+							enabled="false"
+							editable="false"/>
+				
+				<s:Label width="100%" height="20"
+						 text="ignoredWhoAcctID:" color="#FFFFFF"
+						 verticalAlign="middle" textAlign="left"/>
+				<s:TextArea id="ignoredWhoAcctID_TA"
+							width="100%" height="20"
+							verticalAlign="middle" textAlign="left"
+							fontWeight="bold"
+							color="#FFFFFF" contentBackgroundColor="#00D000"
+							enabled="false"
+							editable="false"/>
+				
+				<s:Label width="100%" height="20"
+						 text="ignoredWhoID:" color="#FFFFFF"
+						 verticalAlign="middle" textAlign="left"/>
+				<s:TextArea id="ignoredWhoID_TA"
+							width="100%" height="20"
+							verticalAlign="middle" textAlign="left"
+							fontWeight="bold"
+							color="#FFFFFF" contentBackgroundColor="#00D000"
+							enabled="false"
+							editable="false"/>
+				
+				<s:Label width="100%" height="20"
+						 text="Date:" color="#FFFFFF"
+						 verticalAlign="middle" textAlign="left"/>
+				<s:TextArea id="blockDate_TA"
+							width="100%" height="20"
+							verticalAlign="middle" textAlign="left"
+							fontWeight="bold"
+							color="#FFFFFF" contentBackgroundColor="#00D000"
+							enabled="false"
+							editable="false"/>
+				
+			</s:VGroup>
+			
+		</s:HGroup>
+		
+		
+		
+		<s:HGroup width="100%"
+				  horizontalAlign="center"
+				  verticalAlign="middle">
+			
+			<s:Button id="unblockBtn"
+					  label="Unblock"
+					  enabled="false"
+					  color="#FFFFFF"
+					  click="unblockBtn_clickHandler(event)"/>
+			
+			<s:Button id="closeBtn"
+					  label="Close"
+					  click="closeBtn_clickHandler(event)" 
+					  color="#FFFFFF"/>
+			
+		</s:HGroup>
+		
+		
+	</s:VGroup>
+	
+	
+	
+	
+	
+	
+</s:TitleWindow>

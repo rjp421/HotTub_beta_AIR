@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 preinitialize="preinitializeHandler(event)"
+		 creationComplete="camSpotCreationCompleteHandler(event)"
+		 mouseOver="camSpot_mouseOverHandler(event)" 
+		 mouseOut="camSpot_mouseOutHandler(event)"
+		 dragComplete="dragCompleteHandler(event)"
+		 dragEnter="dragEnterHandler(event)"
+		 dragExit="dragExitHandler(event)"
+		 dragDrop="dragDropHandler(event)"
+		 alpha="0.4">
+	
+	
+	<!-- STATES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	<!--	
+	<s:states>
+	</s:states>
+	-->
+	
+	
+	<!-- METADATA ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	
+	
+	<!-- LAYOUTS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	
+	
+	<!-- STYLES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	
+	
+	
+	<!-- FILTERS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	<!--
+	<s:filters>
+		<s:DropShadowFilter alpha="1"
+							angle="45"
+							color="#000000"
+							distance="2"
+							hideObject="false"
+							inner="false"/>
+	</s:filters>
+	-->
+	
+	
+	
+	<!-- SCRIPTS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	
+	<fx:Script source="..\\scripts\\CamSpot.as"/>
+	
+	
+	
+	<!-- DECLARATIONS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (services, value objects, etc) here -->
+	</fx:Declarations>
+	
+	
+	
+	
+	<!-- UI COMPONENTS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	
+	
+	
+	
+	<s:Rect id="camSpot_BG_rect" 
+			width="100%" height="100%" 
+			radiusX="8">
+		<s:fill>
+			<s:LinearGradient rotation="90">
+				<s:GradientEntry alpha="1.0" color="#003300" ratio="0"/>
+				<s:GradientEntry alpha="1.0" color="#004400" ratio="1"/>
+			</s:LinearGradient>
+		</s:fill>
+	</s:Rect>
+	
+	
+	
+	<s:Label id="userName_L"
+			 top="0" left="0" 
+			 height="20" width="300" 
+			 textAlign="left" verticalAlign="middle"
+			 maxDisplayedLines="1" lineBreak="toFit"
+			 styleName="userNameLabel">
+		<s:filters>
+			<s:DropShadowFilter distance="2" angle="45" color="#000000" strength="2" alpha="0.75"/>
+		</s:filters>
+	</s:Label>
+	
+	
+	
+	<s:Button id="statsBtn"
+			  label="STATS"
+			  includeInLayout="false"
+			  verticalCenter="0" horizontalCenter="0"
+			  click="statsBtn_clickHandler(event)"/>
+	
+	
+	
+	
+	<!-- top right -->
+	<s:VGroup id="btnVGroup"
+			  width="20" height="80"
+			  top="0" right="0"
+			  gap="0" clipAndEnableScrolling="false">
+		
+		
+		<s:Image id="xImgBtn"
+				 width="20" height="20"
+				 visible="true" alpha="0.2"
+				 buttonMode="true"
+				 click="xImgBtn_clickHandler(event)"
+				 toolTip="Close the cam"/>
+		
+		<s:Image id="arrowImgBtn"
+				 visible="true" alpha="0.2"
+				 width="20" height="20" 
+				 buttonMode="true"
+				 click="arrowImgBtn_clickHandler(event)"/>
+		
+		<s:Image id="videoOnOffBtn"
+				 width="20" height="20"
+				 visible="true" alpha="0.2"
+				 buttonMode="true"
+				 click="videoOnOffBtn_clickHandler(event)"
+				 toolTip="Turn the video on/off"/>
+		
+		<s:Image id="audioOnOffBtn"
+				 width="20" height="20"
+				 visible="true" alpha="0.2"
+				 toolTip="Turn the audio on/off"
+				 buttonMode="true"
+				 click="audioOnOffBtn_clickHandler(event)"
+				 mouseOver="audioOnOffBtn_mouseOverHandler(event)"
+				 mouseOut="audioOnOffBtn_mouseOutHandler(event)"/>
+		
+		<s:VSlider id="camSpotVolume_VS"
+				   height="80" width="20" 
+				   liveDragging="true" 
+				   minimum="0" maximum="1" 
+				   stepSize=".01" value=".7" 
+				   snapInterval=".01" buttonMode="true" 
+				   visible="false" showDataTip="false" 
+				   change="camSpotVolume_VS_changeHandler(event)"
+				   mouseOut="camSpotVolume_VS_mouseOutHandler(event)"/>
+		
+	</s:VGroup>
+	
+	
+	
+	
+	
+	<!-- bottom -->
+	<s:Group id="statsGroup" 
+			 visible="{parentApplication.applicationBar.bwChart.showCamSpotStats}"
+			 width="100%" height="15"
+			 bottom="0" alpha="0.4"
+			 cachePolicy="off">
+		
+		
+		<!-- gray bg rect -->
+		<s:Rect width="100%" height="100%">
+			<s:fill>
+				<s:SolidColor color="#333333" alpha="0.8"/>
+			</s:fill>
+		</s:Rect>
+		
+		
+		<!-- current/droppedFPS, current/maxBytesPerSecond, toggleBWGraphBtn, camSpotInfoBtn -->
+		<s:HGroup id="statsHGroup"
+				  width="100%" height="100%" gap="10"
+				  horizontalAlign="center"
+				  verticalAlign="middle"
+				  visible="false">
+			
+			
+			<s:HGroup height="100%" gap="2"
+					  horizontalAlign="center"
+					  verticalAlign="middle"
+					  toolTip="currentFPS">
+				
+				<s:BitmapImage id="statsCurrentFPS_Img"
+							   width="15" height="15"/>
+				
+				<s:Label id="statsCurrentFPS_L"
+						 fontSize="8"/>
+				
+			</s:HGroup>
+			
+			
+			<s:HGroup height="100%" gap="2"
+					  horizontalAlign="center"
+					  verticalAlign="middle"
+					  toolTip="droppedFPS">
+				
+				<s:BitmapImage id="statsDroppedFPS_Img"
+							   width="15" height="15"/>
+				
+				<s:Label id="statsDroppedFPS_L"
+						 fontSize="8"/>
+				
+			</s:HGroup>
+			
+			
+			<s:HGroup height="100%" gap="2"
+					  horizontalAlign="center"
+					  verticalAlign="middle"
+					  toolTip="currentBytesPerSecond">
+				
+				<s:BitmapImage id="statsCurrentBPS_Img"
+							   width="15" height="15"/>
+				
+				<s:Label id="statsCurrentBPS_L"
+						 fontSize="8"/>
+				
+			</s:HGroup>
+			
+			
+			<s:HGroup height="100%" gap="2"
+					  horizontalAlign="center"
+					  verticalAlign="middle"
+					  toolTip="maxBytesPerSecond">
+				
+				<s:BitmapImage id="statsMaxBPS_Img"
+							   width="15" height="15"/>
+				
+				<s:Label id="statsMaxBPS_L"
+						 fontSize="8"/>
+				
+			</s:HGroup>
+			
+			
+			<s:Image id="toggleBWGraphBtn"
+					 enabled="{parentApplication.applicationBar.bwChart.showBWChart}"
+					 width="15" height="15" 
+					 horizontalAlign="right" buttonMode="true"
+					 toolTip="Toggle the bandwidth graph for this cam."
+					 click="toggleBWGraphBtn_clickHandler(event)"/>
+			
+			
+			<s:Image id="camSpotInfoBtn"
+					 width="15" height="15"
+					 horizontalAlign="right" buttonMode="true"
+					 toolTip="Toggle statistics"
+					 click="camSpotInfoBtn_clickHandler(event)"/>
+			
+			
+		</s:HGroup>
+		
+		
+	</s:Group>
+	
+	<!--
+				   horizontalCenter="0"
+	-->
+	<s:BitmapImage id="appVUMeter_BMI"
+				   width="6" height="24" x="2"
+				   verticalCenter="0">
+		<s:mask>
+			<s:Graphic id="appVUMeterMask" 
+					   width="6" height="24">
+				<s:Rect width="6" height="24">
+					<s:fill>
+						<s:SolidColor color="0x000000" alpha="0"/>
+					</s:fill>
+				</s:Rect>
+			</s:Graphic>
+		</s:mask>
+	</s:BitmapImage>
+	
+	
+	
+</s:Group>

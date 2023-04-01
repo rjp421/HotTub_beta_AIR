@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:MXDataGridItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+						  xmlns:s="library://ns.adobe.com/flex/spark" 
+						  xmlns:mx="library://ns.adobe.com/flex/mx" 
+						  focusEnabled="true" 
+						  accentColor="#19B819">
+	
+	
+	
+	<!-- LAYOUT ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	
+	<s:layout>
+		<s:HorizontalLayout verticalAlign="middle"
+							horizontalAlign="center"
+							gap="0"/>
+	</s:layout>
+	
+	
+	
+	<!-- DECLARATIONS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (services, value objects, etc) here -->
+	</fx:Declarations>
+	
+	
+	
+	<!-- STATES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	<!--	
+	<s:states>
+	</s:states>
+	-->	
+	
+	
+	
+	<!-- METADATA ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	
+	<!--	
+	<fx:Metadata>
+	</fx:Metadata>
+	-->
+	
+	
+	
+	<!-- SCRIPT ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	<fx:Script>
+		<![CDATA[
+			
+			
+			import me.whohacked.app.IconManager_Singleton;
+			
+			
+			
+			
+			override public function set data(value:Object):void
+			{
+				super.data = value;
+				
+				formatIsUserViewing();
+				formatIsUserListening();
+				formatIsUsersVideoOn();
+				formatIsUsersAudioOn();
+				
+				if (data.isViewing || data.isListening)
+					leftVG.width = 10;
+				else
+					leftVG.width = 0;
+				
+				if (data.isUsersVideoOn || data.isUsersAudioOn)
+					rightVG.width = 10;
+				else
+					rightVG.width = 0;
+				
+				value = null;
+			}
+			
+			
+			private function formatIsUserViewing():void
+			{
+				if (data.isViewing)
+				{
+					// the users video is on
+					isUserViewingImg.source = IconManager_Singleton.getInstance().getIcon('app_eye');
+				} else {
+					// the users video is off
+					isUserViewingImg.source = null;
+				}
+			}
+			
+			
+			private function formatIsUserListening():void
+			{
+				if (data.isListening)
+				{
+					isUserListeningImg.source = IconManager_Singleton.getInstance().getIcon('app_speaker');
+				} else {
+					isUserListeningImg.source = null;
+				}
+			}
+			
+			
+			private function formatIsUsersVideoOn():void
+			{
+				if (data.isMyVideoOn || data.isUsersVideoOn)
+				{
+					// the users video is on
+					camOnOffImg.source = IconManager_Singleton.getInstance().getIcon('app_cam');
+				} else {
+					// the users video is off
+					camOnOffImg.source = null;
+				}
+			}
+			
+			
+			private function formatIsUsersAudioOn():void
+			{
+				if (data.isMyAudioOn || data.isUsersAudioOn)
+				{
+					// the users audio is on
+					audioOnOffImg.source = IconManager_Singleton.getInstance().getIcon('app_mic');
+				} else {
+					// the users audio is off
+					audioOnOffImg.source = null;
+				}
+			}
+
+			
+			
+			
+		]]>
+	</fx:Script>
+	
+	
+	
+	
+	
+	<!-- UI COMPONENTS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	
+	
+	<s:HGroup gap="0"
+			  verticalAlign="middle"
+			  horizontalAlign="center">
+		
+		
+		<!-- left -->
+		<s:VGroup id="leftVG" 
+				  gap="0"
+				  width="10" 
+				  height="20"
+				  verticalAlign="middle"
+				  horizontalAlign="center">
+			
+			<s:BitmapImage id="isUserViewingImg" 
+						   clearOnLoad="true"
+						   height="10" width="10"/>
+			<s:BitmapImage id="isUserListeningImg" 
+						   clearOnLoad="true"
+						   height="10" width="10"/>
+			
+		</s:VGroup>
+		
+		
+		<!-- right -->
+		<s:VGroup id="rightVG" 
+				  gap="0"
+				  width="12" 
+				  height="20"
+				  verticalAlign="middle"
+				  horizontalAlign="center">
+			
+			<s:BitmapImage id="camOnOffImg" 
+						   clearOnLoad="true"
+						   height="10" width="10"/>
+			<s:BitmapImage id="audioOnOffImg" 
+						   clearOnLoad="true"
+						   height="10" width="10"/>
+			
+		</s:VGroup>
+		
+		
+	</s:HGroup>
+	
+	
+	
+</s:MXDataGridItemRenderer>

@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" 
+			   preinitialize="preinitializeHandler(event)"
+			   creationComplete="creationCompleteHandler(event)"
+			   windowMoving="titleWin_windowMovingHandler(event)"
+			   close="handleCloseEvent()" 
+			   backgroundColor="#249F18" 
+			   title="Live Stream">
+	
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	
+	<s:layout>
+		<s:VerticalLayout horizontalAlign="center"
+						  verticalAlign="middle"
+						  gap="0"/>
+	</s:layout>
+	
+	<s:states>
+		<s:State name="default"/>
+	</s:states>
+	
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			import mx.managers.PopUpManager;
+			
+			import spark.components.Alert;
+			import spark.events.TitleWindowBoundsEvent;
+			import spark.primitives.BitmapImage;
+			
+			import events.CustomEvent;
+			
+			import me.whohacked.app.AppWideDebug_Singleton;
+			import me.whohacked.app.AppWideEventDispatcher_Singleton;
+			import me.whohacked.app.AppWide_Singleton;
+			import me.whohacked.app.IconManager_Singleton;
+			
+			
+			[Bindable]
+			private var __iconManager:IconManager_Singleton;
+			private var __appWideSingleton:AppWide_Singleton;
+			private var __appWideEventDispatcher:AppWideEventDispatcher_Singleton;
+			
+			
+			
+			private function preinitializeHandler(event:FlexEvent):void
+			{
+				__iconManager = IconManager_Singleton.getInstance();
+				__appWideSingleton = AppWide_Singleton.getInstance();
+				__appWideEventDispatcher = AppWideEventDispatcher_Singleton.getInstance();
+				
+				event = null;
+			}
+			
+			
+			private function creationCompleteHandler(event:FlexEvent):void
+			{
+				parentApplication.lobby.openPopUps_AC.addItem(this);
+				
+				PopUpManager.centerPopUp(this);
+				
+				event = null;
+			}
+			
+			
+			private function okBtn_clickHandler(event:MouseEvent):void
+			{
+				event = null;
+				
+				handleCloseEvent();
+			}
+			
+			
+			private function cancelBtn_clickHandler(event:MouseEvent):void
+			{
+				event = null;
+				
+				handleCloseEvent();
+			}
+			
+			
+			// Handle the close button and Cancel button.
+			private function handleCloseEvent():void
+			{
+				parentApplication.lobby.openPopUps_AC.removeItemAt(parentApplication.lobby.openPopUps_AC.getItemIndex(this));
+				
+				__iconManager = null;
+				__appWideSingleton = null;
+				__appWideEventDispatcher = null;
+				
+				PopUpManager.removePopUp(this);
+			}
+			
+			
+			private function titleWin_windowMovingHandler(event:TitleWindowBoundsEvent):void
+			{
+				if (event.afterBounds.left < 0)
+				{
+					event.afterBounds.left = 0;
+				} else if (event.afterBounds.right > systemManager.stage.stageWidth) {
+					event.afterBounds.left = systemManager.stage.stageWidth - event.afterBounds.width;
+				}
+				if (event.afterBounds.top < 0)
+				{
+					event.afterBounds.top = 0;
+				} else if (event.afterBounds.bottom > systemManager.stage.stageHeight) {
+					event.afterBounds.top = systemManager.stage.stageHeight - event.afterBounds.height;
+				}
+				
+				event = null;
+			}
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			private function debugMsg(str:String):void
+			{
+				AppWideDebug_Singleton.getInstance().newDebugMessage(this.id, str);
+			}
+			
+			
+		]]>
+	</fx:Script>
+	
+	
+	
+	<s:Spacer height="10"/>
+	
+	
+	<s:HGroup horizontalAlign="center"
+			  verticalAlign="middle">
+		
+		
+		<!-- video settings -->
+		<s:VGroup width="300" height="200" 
+				  left="10" right="5" 
+				  horizontalAlign="center"
+				  verticalAlign="middle">
+			
+			<s:Label text="Video"/>
+			
+			<s:BorderContainer width="100%" height="100%" 
+							   backgroundAlpha="0" 
+							   borderColor="#000000" 
+							   cornerRadius="10">
+				
+				<s:layout>
+					<s:VerticalLayout horizontalAlign="center" 
+									  verticalAlign="middle"/>
+				</s:layout>
+				
+			</s:BorderContainer>
+			
+		</s:VGroup>
+		
+		
+		<!-- audio settings -->
+		<s:VGroup width="300" height="200" 
+				  left="10" right="5" 
+				  horizontalAlign="center"
+				  verticalAlign="middle">
+			
+			<s:Label text="Audio"/>
+			
+			<s:BorderContainer width="100%" height="100%" 
+							   backgroundAlpha="0" 
+							   borderColor="#000000" 
+							   cornerRadius="10">
+				
+				<s:layout>
+					<s:VerticalLayout horizontalAlign="center" 
+									  verticalAlign="middle"/>
+				</s:layout>
+				
+			</s:BorderContainer>
+			
+		</s:VGroup>
+		
+	</s:HGroup>
+	
+	
+	<s:Spacer height="20"/>
+	
+	
+	<s:HGroup width="100%" height="100%" 
+			  horizontalAlign="center"
+			  verticalAlign="middle">
+		
+		<s:Button id="okBtn" label="OK"
+				  click="okBtn_clickHandler(event)"/>
+		
+		<s:Button id="cancelBtn" label="Cancel"
+				  click="cancelBtn_clickHandler(event)"/>
+		
+		
+	</s:HGroup>
+	
+	
+	
+</s:TitleWindow>

@@ -1,0 +1,662 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" 
+			   preinitialize="preinitializeHandler(event)"
+			   creationComplete="creationCompleteHandler(event)"
+			   windowMoving="titleWin_windowMovingHandler(event)"
+			   close="handleCloseEvent()" 
+			   minWidth="600" minHeight="400"
+			   backgroundColor="#249F18" 
+			   title="Settings">
+	
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	
+	<s:layout>
+		<s:VerticalLayout horizontalAlign="center"
+						  verticalAlign="middle"
+						  paddingTop="20" paddingBottom="10"
+						  paddingLeft="10" paddingRight="10"/>
+	</s:layout>
+	
+	<s:states>
+		<s:State name="appSettingsState"/>
+		<s:State name="layoutSettingsState"/>
+		<s:State name="videoSettingsState"/>
+		<s:State name="audioSettingsState"/>
+	</s:states>
+	
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.events.CloseEvent;
+			import mx.events.FlexEvent;
+			import mx.managers.PopUpManager;
+			
+			import spark.components.Alert;
+			import spark.events.IndexChangeEvent;
+			import spark.events.TitleWindowBoundsEvent;
+			
+			import events.CustomEvent;
+			
+			import me.whohacked.app.AppWideDebug_Singleton;
+			import me.whohacked.app.AppWideEventDispatcher_Singleton;
+			import me.whohacked.app.AppWide_Singleton;
+			import me.whohacked.app.IconManager_Singleton;
+			import me.whohacked.app.LocalSOManager_Singleton;
+			
+			import org.apache.flex.collections.ArrayList;
+			
+			
+			
+			[Bindable]
+			private var __iconManager:IconManager_Singleton;
+			private var __appWideSingleton:AppWide_Singleton;
+			private var __appWideEventDispatcher:AppWideEventDispatcher_Singleton;
+			
+			
+			
+			private function preinitializeHandler(event:FlexEvent):void
+			{
+				__iconManager = IconManager_Singleton.getInstance();
+				__appWideSingleton = AppWide_Singleton.getInstance();
+				__appWideEventDispatcher = AppWideEventDispatcher_Singleton.getInstance();
+				
+				event = null;
+			}
+			
+			
+			// fill out and select any pre-saved settings, at least..
+			private function creationCompleteHandler(event:FlexEvent):void
+			{
+				parentApplication.lobby.openPopUps_AC.addItem(this);
+				PopUpManager.centerPopUp(this);
+				
+				refreshCurrentSettings();
+				
+				event = null;
+			}
+			
+			
+			public function refreshCurrentSettings():void
+			{
+				var selectedCameraName:String = __appWideSingleton.localCamera ? __appWideSingleton.localCamera.name : (Camera.getCamera() ? Camera.getCamera().name : "");
+				var selectedMicrophoneName:String = __appWideSingleton.localMic ? __appWideSingleton.localMic.name : (Microphone.getMicrophone() ? Microphone.getMicrophone().name : "");
+				//var selectedCameraName:String = __appWideSingleton.localCamera ? __appWideSingleton.localCamera.name : '';
+				//var selectedMicrophoneName:String = __appWideSingleton.localMic ? __appWideSingleton.localMic.name : '';
+				
+				// set any previously saved settings
+				showBWChart_CB.selected = __appWideSingleton.appInfoObj['showBWChart'];
+				showCamSpotStats_CB.selected = __appWideSingleton.appInfoObj['showCamSpotStats'];
+				
+				autoFillCams_CB.selected = __appWideSingleton.appInfoObj['isAutoFillCamsChecked'];
+				allCamsOff_CB.selected = __appWideSingleton.appInfoObj['isAllCamsOffChecked'];
+				allAudioOff_CB.selected = __appWideSingleton.appInfoObj['isAllAudioOffChecked'];
+				
+				unmuteRoomHost_CB.selected = __appWideSingleton.appInfoObj['isUnmuteRoomHostChecked'];
+				
+				if (this['selectedCameraInputSize_'+__appWideSingleton.appInfoObj["selectedCameraInputSize"]+'_RB'])
+				{
+					this['selectedCameraInputSize_'+__appWideSingleton.appInfoObj["selectedCameraInputSize"]+'_RB'].selected = true;
+				}
+				
+				for (var i:int = 0; i < selectedCamera_DDL.dataProvider.length; ++i) 
+				{
+					if (selectedCamera_DDL.dataProvider.getItemAt(i) == selectedCameraName)
+					{
+						selectedCamera_DDL.selectedIndex = i;
+						break;
+					}
+				}
+				
+				for (i = 0; i < selectedMicrophone_DDL.dataProvider.length; ++i) 
+				{
+					if (selectedMicrophone_DDL.dataProvider.getItemAt(i) == selectedMicrophoneName)
+					{
+						selectedMicrophone_DDL.selectedIndex = i;
+						break;
+					}
+				}
+				
+				selectedMicrophoneName = null;
+				selectedCameraName = null;
+			}
+			
+			
+			private function showBWChart_CB_valueCommitHandler(event:FlexEvent):void
+			{
+				__appWideSingleton.setAppInfo("showBWChart", showBWChart_CB.selected);
+				
+				parentApplication.applicationBar.bwChart.showBWChart = showBWChart_CB.selected;
+				
+				event = null;
+			}
+			
+			
+			private function showCamSpotStats_CB_valueCommitHandler(event:FlexEvent):void
+			{
+				__appWideSingleton.setAppInfo("showCamSpotStats", showCamSpotStats_CB.selected);
+				
+				parentApplication.applicationBar.bwChart.showCamSpotStats = showCamSpotStats_CB.selected;
+				
+				event = null;
+			}
+			
+			
+			private function autoFillCams_CB_valueCommitHandler(event:FlexEvent):void
+			{
+				__appWideSingleton.setAppInfo("isAutoFillCamsChecked", autoFillCams_CB.selected);
+				
+				event = null;
+			}
+			
+			
+			private function allCamsOff_CB_valueCommitHandler(event:FlexEvent):void
+			{
+				__appWideSingleton.setAppInfo("isAllCamsOffChecked", allCamsOff_CB.selected);
+				
+				event = null;
+			}
+			
+			
+			private function allAudioOff_CB_valueCommitHandler(event:FlexEvent):void
+			{
+				__appWideSingleton.setAppInfo("isAllAudioOffChecked", allAudioOff_CB.selected);
+				
+				event = null;
+			}
+			
+			
+			private function unmuteRoomHost_CB_valueCommitHandler(event:FlexEvent):void
+			{
+				__appWideSingleton.setAppInfo("isUnmuteRoomHostChecked", unmuteRoomHost_CB.selected);
+				
+				event = null;
+			}
+			
+			
+			private function selectedCamera_DDL_changeHandler(event:IndexChangeEvent):void
+			{
+				if (!selectedCamera_DDL.selectedItem.toString().length) 
+					return;
+				
+				__appWideSingleton.setAppInfo("selectedCameraName", selectedCamera_DDL.selectedItem.toString());
+				
+				event = null;
+			}
+			
+			
+			private function selectedMicrophone_DDL_changeHandler(event:IndexChangeEvent):void
+			{
+				if (!selectedMicrophone_DDL.selectedItem.toString().length) 
+					return;
+				
+				__appWideSingleton.setAppInfo("selectedMicrophoneName", selectedMicrophone_DDL.selectedItem.toString());
+				
+				event = null;
+			}
+			
+			
+			private function selectedCameraInputSize_RB_valueCommitHandler(event:FlexEvent):void
+			{
+				if (!event.target.selected) 
+					return;
+				
+				var tmpArr1:Array = event.target.id.split("_");
+				var tmpStr:String = tmpArr1[1];
+				var tmpArr2:Array = tmpStr.split("x");
+				var tmpWidth:String = tmpArr2[0];
+				var tmpHeight:String = tmpArr2[1];
+				
+				__appWideSingleton.setAppInfo("selectedCameraInputSize", tmpStr);
+				
+				// TODO:
+				// stop and restart any preview/publishing
+				// in order to take affect of any 
+				// device or setting change.
+				
+				tmpHeight = null;
+				tmpWidth = null;
+				tmpArr2 = null;
+				tmpStr = null;
+				tmpArr1 = null;
+				event = null;
+			}
+			
+			
+			private function openFlashSettingsBtn_clickHandler(event:MouseEvent):void
+			{
+				var device:String = event.target.id.split('choose')[1].split('_')[0];
+				var alert:Alert = Alert.show('If the settings did not popup, right click the application and goto Settings.' + '\n\n' +
+												'Goto the Camera and Microphone tabs to choose.' + '\n\n' +
+												'Click OK when you\'re finished.', 
+												'', Alert.OK, this, alertCloseHandler, 
+												__iconManager.getIcon('app_info'));
+				
+				__appWideEventDispatcher.dispatchEvent(new CustomEvent('openFlashSettings', false,false, {device:device}));
+				
+				function alertCloseHandler(event:CloseEvent):void
+				{
+					// NOTE: using Camera/Mic.getCamera/Mic will use the device 
+					// chosen in the Flash Player Settings.
+					//
+					// Use __appWideSingleton.localCamera/Mic.name to refer to the saved devices
+					var selectedCameraName:String = __appWideSingleton.localCamera ? __appWideSingleton.localCamera.name : Camera.getCamera().name;
+					var selectedMicrophoneName:String = __appWideSingleton.localMic ? __appWideSingleton.localMic.name : Microphone.getMicrophone().name;
+					
+					for (var i:int = 0; i < selectedCamera_DDL.dataProvider.length; ++i) 
+					{
+						if (selectedCamera_DDL.dataProvider.getItemAt(i) == selectedCameraName)
+						{
+							selectedCamera_DDL.selectedIndex = i;
+							break;
+						}
+					}
+					
+					for (i = 0; i < selectedMicrophone_DDL.dataProvider.length; ++i) 
+					{
+						if (selectedMicrophone_DDL.dataProvider.getItemAt(i) == selectedMicrophoneName)
+						{
+							selectedMicrophone_DDL.selectedIndex = i;
+							break;
+						}
+					}
+					
+					selectedMicrophoneName = null;
+					selectedCameraName = null;
+					event = null;
+				}
+				
+				alert = null;
+				device = null;
+				event = null;
+			}
+			
+			
+			private function resetBtn_clickHandler(event:MouseEvent):void
+			{
+				spark.components.Alert.show('Are you sure you want to reset everything to their defaults?',
+											'Settings Reset',
+											(spark.components.Alert.YES|spark.components.Alert.NO),
+											this,
+											alertCloseHandler, 
+											__iconManager.getIcon('app_info'));
+				function alertCloseHandler(event:CloseEvent):void
+				{
+					switch(event.detail.toString())
+					{
+						case '1': // YES
+						{
+							//trace('DO RESET');
+							LocalSOManager_Singleton.getInstance().resetToDefaults();
+							// show the default settings
+							refreshCurrentSettings();
+							break;
+						}
+						case '2': // NO
+						{
+							break;
+						}
+						default:
+						{
+							trace('CLICKED ' + event.detail);
+							break;
+						}
+					}
+				}
+				
+				event = null;
+			}
+			
+			
+			private function closeBtn_clickHandler(event:MouseEvent):void
+			{
+				event = null;
+				
+				handleCloseEvent();
+			}
+			
+			
+			private function cancelBtn_clickHandler(event:MouseEvent):void
+			{
+				event = null;
+				
+				handleCloseEvent();
+			}
+			
+			
+			// Handle the close button and Cancel button.
+			private function handleCloseEvent():void
+			{
+				__iconManager = null;
+				__appWideSingleton = null;
+				__appWideEventDispatcher = null;
+				
+				parentApplication.lobby.openPopUps_AC.removeItemAt(parentApplication.lobby.openPopUps_AC.getItemIndex(this));
+				
+				PopUpManager.removePopUp(this);
+			}
+			
+			
+			private function titleWin_windowMovingHandler(event:TitleWindowBoundsEvent):void
+			{
+				if (event.afterBounds.left < 0)
+				{
+					event.afterBounds.left = 0;
+				} else if (event.afterBounds.right > systemManager.stage.stageWidth) {
+					event.afterBounds.left = systemManager.stage.stageWidth - event.afterBounds.width;
+				}
+				if (event.afterBounds.top < 0)
+				{
+					event.afterBounds.top = 0;
+				} else if (event.afterBounds.bottom > systemManager.stage.stageHeight) {
+					event.afterBounds.top = systemManager.stage.stageHeight - event.afterBounds.height;
+				}
+				
+				event = null;
+			}
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			private function debugMsg(str:String):void
+			{
+				AppWideDebug_Singleton.getInstance().newDebugMessage(this.id, str);
+				str = null;
+			}
+			
+			
+			
+		]]>
+	</fx:Script>
+	
+	
+	<!--
+	change="settingsType_BB_changeHandler(event)"
+		
+		<s:ButtonBar id="settingsType_BB" 
+					 width="100%" height="20"/>
+		
+	<s:Spacer height="10"/>
+	-->
+	
+	
+	<s:HGroup width="100%" height="100%" 
+			  horizontalAlign="center"
+			  verticalAlign="middle"
+			  gap="20">
+		
+		
+		<!-- app settings -->
+		<s:VGroup width="100%" height="100%" 
+				  horizontalAlign="center"
+				  verticalAlign="middle"
+				  opaqueBackground="0x008800">
+			
+			<s:Label text="Application"/>
+			
+			<!-- application settings -->
+			<s:VGroup id="appSettings_G"
+					  horizontalAlign="center" 
+					  verticalAlign="middle">
+				
+				<s:CheckBox id="showBWChart_CB"
+							label="Show the bandwidth graph"
+							valueCommit="showBWChart_CB_valueCommitHandler(event)"/>
+				
+				<s:CheckBox id="showCamSpotStats_CB"
+							label="Show stats for each camspot" 
+							valueCommit="showCamSpotStats_CB_valueCommitHandler(event)"/>
+				
+				<s:Spacer height="20"/>
+				
+				<s:CheckBox id="autoFillCams_CB"
+							label="Auto dock users' cams" 
+							valueCommit="autoFillCams_CB_valueCommitHandler(event)"/>
+				
+				<s:CheckBox id="allCamsOff_CB"
+							label="Pause video when docking cams" 
+							valueCommit="allCamsOff_CB_valueCommitHandler(event)"/>
+				
+				<s:CheckBox id="allAudioOff_CB"
+							label="Mute audio when docking cams" 
+							valueCommit="allAudioOff_CB_valueCommitHandler(event)"/>
+				
+				<s:Spacer height="20"/>
+				
+				<s:CheckBox id="unmuteRoomHost_CB"
+							label="Auto-unmute the room hosts audio" 
+							valueCommit="unmuteRoomHost_CB_valueCommitHandler(event)"/>
+				<!--
+				<s:CheckBox id="showCamSpotStats_CB"
+							label="" 
+							valueCommit="showCamSpotStats_CB_valueCommitHandler(event)"/>
+				-->
+			</s:VGroup>
+			
+		</s:VGroup>
+		
+		
+		<!-- device settings -->
+		<s:VGroup width="100%" height="100%" 
+				  horizontalAlign="center"
+				  verticalAlign="middle"
+				  opaqueBackground="0x008800"
+				  gap="10">
+			
+			<s:Label text="Devices"/>
+			
+			<s:VGroup id="deviceSettings_video_VG"
+					  width="100%" height="100%"
+					  horizontalAlign="center" 
+					  verticalAlign="middle">
+				
+				
+				<!-- select cam & resolution -->
+				<s:VGroup width="100%" 
+						  horizontalAlign="center"
+						  verticalAlign="middle">
+					
+					<s:Label width="100%" 
+							 text="Video:"
+							 textAlign="center"
+							 opaqueBackground="0x009900"/>
+					
+					<s:Button id="chooseCamera_Btn"
+							  width="200" height="30"
+							  label="Choose Camera"
+							  click="openFlashSettingsBtn_clickHandler(event)"/>
+					
+					<s:DropDownList id="selectedCamera_DDL"
+									width="100%" enabled="false"
+									change="selectedCamera_DDL_changeHandler(event)"
+									dataProvider="{new ArrayList(Camera.names)}"/>
+					
+					<s:VGroup width="100%" 
+							  horizontalAlign="center"
+							  verticalAlign="middle">
+						
+						<s:Label width="100%" 
+								 text="Capture Resolution"
+								 textAlign="center"/>
+						
+						<s:HGroup width="100%" 
+								  horizontalAlign="center"
+								  verticalAlign="middle"
+								  opaqueBackground="0x004400">
+							
+							<s:Label text="4:3" 
+									 opaqueBackground="0x006600"/>
+							
+							<s:VGroup width="100%" 
+									  horizontalAlign="center"
+									  verticalAlign="middle">
+								
+								<s:HGroup width="100%" 
+										  horizontalAlign="center"
+										  verticalAlign="middle"
+										  gap="20">
+									
+									<s:RadioButton id="selectedCameraInputSize_120x90_RB"
+												   layoutDirection="rtl"
+												   label="120x90"
+												   valueCommit="selectedCameraInputSize_RB_valueCommitHandler(event)"/>
+									
+									<s:RadioButton id="selectedCameraInputSize_160x120_RB"
+												   layoutDirection="rtl"
+												   label="160x120"
+												   valueCommit="selectedCameraInputSize_RB_valueCommitHandler(event)"/>
+									
+								</s:HGroup>
+								
+								
+								<s:HGroup width="100%" 
+										  horizontalAlign="center"
+										  verticalAlign="middle"
+										  gap="20">
+									
+									<s:RadioButton id="selectedCameraInputSize_176x144_RB"
+												   layoutDirection="rtl"
+												   label="176x144"
+												   valueCommit="selectedCameraInputSize_RB_valueCommitHandler(event)"/>
+									
+									<s:RadioButton id="selectedCameraInputSize_320x240_RB"
+												   layoutDirection="rtl"
+												   label="320x240"
+												   valueCommit="selectedCameraInputSize_RB_valueCommitHandler(event)"/>
+									
+									<!--
+									<s:RadioButton id="selectedCameraInputSize_640x480_RB"
+									layoutDirection="rtl"
+									label="640x480"
+									valueCommit="selectedCameraInputSize_RB_valueCommitHandler(event)"/>
+									<s:RadioButton id="selectedCameraInputSize_352x288_RB"
+									layoutDirection="rtl"
+									label="352x288"
+									valueCommit="selectedCameraInputSize_RB_valueCommitHandler(event)"/>
+									-->
+								</s:HGroup>
+								
+							</s:VGroup>
+							
+						</s:HGroup>
+						
+						
+						<s:HGroup width="100%" 
+								  horizontalAlign="center"
+								  verticalAlign="middle"
+								  gap="20" 
+								  opaqueBackground="0x004400">
+							
+							<s:Label text="16:9"
+									 opaqueBackground="0x006600"/>
+							
+							<s:RadioButton id="selectedCameraInputSize_320x180_RB"
+										   layoutDirection="rtl"
+										   label="320x180"
+										   valueCommit="selectedCameraInputSize_RB_valueCommitHandler(event)"/>
+							
+							<!--
+							<s:RadioButton id="selectedCameraInputSize_640x360_RB"
+							layoutDirection="rtl"
+							label="640x360"
+							valueCommit="selectedCameraInputSize_RB_valueCommitHandler(event)"/>
+							
+							<s:RadioButton id="selectedCameraInputSize_720x480_RB"
+							layoutDirection="rtl"
+							label="720x480"
+							valueCommit="selectedCameraInputSize_RB_valueCommitHandler(event)"/>
+							<s:RadioButton id="selectedCameraInputSize_1280x720_RB"
+							layoutDirection="rtl"
+							label="1280x720"
+							valueCommit="selectedCameraInputSize_RB_valueCommitHandler(event)"/>
+							-->
+						</s:HGroup>
+						
+					</s:VGroup>
+					
+				</s:VGroup>
+				
+			</s:VGroup>
+			
+			
+			<s:Spacer height="10"/>
+			
+			
+			<!-- select mic & codec/bitrate-->
+			<s:VGroup id="deviceSettings_audio_VG"
+					  width="100%" height="100%" 
+					  horizontalAlign="center"
+					  verticalAlign="middle"
+					  opaqueBackground="0x008800">
+				
+				<s:Label width="100%" 
+						 text="Audio:"
+						 textAlign="center"
+						 opaqueBackground="0x009900"/>
+				
+				<s:Button id="chooseMicrophone_Btn"
+						  width="200" height="30"
+						  label="Choose Microphone"
+						  click="openFlashSettingsBtn_clickHandler(event)"/>
+				
+				<s:DropDownList id="selectedMicrophone_DDL"
+								width="100%" enabled="false"
+								change="selectedMicrophone_DDL_changeHandler(event)"
+								dataProvider="{new ArrayList(Microphone.names)}"/>
+				
+			</s:VGroup>
+			
+		</s:VGroup>
+		
+	</s:HGroup>
+	
+	
+	
+	<!-- temp warning -->
+	<s:HGroup width="100%" 
+			  horizontalAlign="center"
+			  verticalAlign="middle">
+		<s:BitmapImage id="devicesChangeWarning_Img"
+					   width="15" height="15" 
+					   source="{__iconManager.getIcon('app_info')}"/>
+		<s:Label color="#FFFF00"
+				 fontSize="7"
+				 text="TEMP: You may need to refresh the page for these changes to be fully applied!"/>
+	</s:HGroup>
+	
+	
+	<!-- bottom buttons -->
+	<s:HGroup width="100%" height="100%" 
+			  horizontalAlign="center"
+			  verticalAlign="middle">
+		
+		<s:Button id="resetBtn" label="Reset" 
+				  toolTip="Reset ALL settings to their defaults."
+				  click="resetBtn_clickHandler(event)"/>
+		
+		<s:Button id="closeBtn" label="Close"
+				  toolTip="Save changes, and close this popup."
+				  click="closeBtn_clickHandler(event)"/>
+		<!--
+		<s:Button id="cancelBtn" label="Cancel"
+				  toolTip="Discard changes, and close this popup."
+				  click="cancelBtn_clickHandler(event)"/>
+		-->
+	</s:HGroup>
+	
+	
+	
+</s:TitleWindow>

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 creationComplete="userListCreationCompleteHandler(event)"
+		 width="160" height="245">
+	
+	
+	<!-- LAYOUTS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	
+	<s:layout>
+		<s:BasicLayout/>
+	</s:layout>
+	
+	
+	<!-- FILTERS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	
+	
+	<!-- STATES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	
+	<!--
+	<s:states>
+		<s:State name="mainState"/>
+		<s:State name="menuState"/>
+	</s:states>
+	-->
+	
+	<!-- METADATA ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	
+	
+	<!-- SCRIPTS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	
+	<fx:Script source="..\\scripts\\UserListPanel.as"/>
+	
+	
+	<!-- DECLARATIONS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (services, value objects, etc) here -->
+	</fx:Declarations>
+	
+	
+	
+	<!-- UI COMPONENTS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	
+	
+	<!-- counters -->
+	<!-- background rect in the back (on the bottom layer) -->
+	<s:Rect width="100%" height="12">
+		<s:fill>
+			<s:SolidColor color="0x004400"/>
+		</s:fill>
+	</s:Rect>
+	
+	<s:HGroup width="100%" height="12"
+			  horizontalAlign="center"
+			  verticalAlign="middle">
+		
+		
+		<!-- users -->
+		<s:HGroup height="12">
+			<s:BitmapImage id="userList_numUsers_Img" 
+						   width="12" height="12"/>
+			<s:Label id="userList_numUsers_L" 
+					 height="12" textAlign="center"
+					 text="0"/>
+		</s:HGroup>
+		
+		
+		<!-- viewers/listeners 
+		<s:BitmapImage id="userList_numViewers_Img"
+					   width="100%" height="100%"/>-->
+		
+		
+	</s:HGroup>
+	
+	
+	
+	
+	
+	<!-- userlist -->
+	<mx:DataGrid id="userList_DG" 
+				 width="160" height="225" 
+				 y="12" rowHeight="20"
+				 borderVisible="false"
+				 showHeaders="false"
+				 dataProvider="{userList_DP}"
+				 horizontalGridLines="false"
+				 verticalGridLines="false"
+				 doubleClickEnabled="true"
+				 itemClick="userList_DG_itemClickHandler(event)"
+				 itemDoubleClick="userList_DG_itemDoubleClickHandler(event)">
+		
+		<mx:columns>
+			
+			<mx:DataGridColumn width="15"
+							   itemRenderer="components.itemrenderers.UserListPanel_UserIconItemRenderer"/>
+			
+			<mx:DataGridColumn itemRenderer="components.itemrenderers.UserListPanel_UserNameItemRenderer"/>
+			
+			<mx:DataGridColumn width="22"
+							   itemRenderer="components.itemrenderers.UserListPanel_MediaIconItemRenderer"/>
+			
+		</mx:columns>
+		
+		
+	</mx:DataGrid>
+	
+	
+	
+	
+</s:Group>

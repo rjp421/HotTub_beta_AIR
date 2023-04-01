@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:components="components.*"
+		 preinitialize="preinitializeHandler(event)"
+		 creationComplete="creationCompleteHandler(event)"
+		 width="100%" height="100%">
+	
+	
+	
+	
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			import mx.managers.PopUpManager;
+			
+			import components.popups.ApplicationSettings_PopUpTitleWindow;
+			import components.popups.BlockList_PopUpTitleWindow;
+			import components.popups.LiveStreamSettings_PopUpTitleWindow;
+			
+			import me.whohacked.app.AppWideDebug_Singleton;
+			import me.whohacked.app.AppWideEventDispatcher_Singleton;
+			import me.whohacked.app.AppWide_Singleton;
+			import me.whohacked.app.IconManager_Singleton;
+			
+			
+			[Bindable]
+			private var __iconManager:IconManager_Singleton;
+			private var __appWideSingleton:AppWide_Singleton;
+			private var __appWideEventDispatcher:AppWideEventDispatcher_Singleton;
+			
+			
+			
+			private function preinitializeHandler(event:FlexEvent):void
+			{
+				__iconManager = IconManager_Singleton.getInstance();
+				__appWideSingleton = AppWide_Singleton.getInstance();
+				__appWideEventDispatcher = AppWideEventDispatcher_Singleton.getInstance();
+				
+				event = null;
+			}
+			
+			
+			private function creationCompleteHandler(event:FlexEvent):void
+			{
+				__appWideEventDispatcher.addEventListener('onAppResize', onAppResizeHandler, false,0,true);
+				__appWideEventDispatcher.addEventListener('onClientGetStats', onClientGetStatsHandler, false,0,true);
+				__appWideEventDispatcher.addEventListener('appClose', onAppClose, false,0,true);
+				
+				event = null;
+			}
+			
+			
+			private function onAppResizeHandler(event:Event):void
+			{
+				/*appWidth_L.text = 'appWidth:\t' + parentApplication.width;
+				appHeight_L.text = 'appHeight:\t' + parentApplication.height;
+				screenWidth_L.text = 'screenWidth:\t' + parentApplication.screen.width;
+				screenHeight_L.text = 'screenHeight:\t' + parentApplication.screen.height;*/
+				
+				event = null;
+			}
+			
+			
+			private function onClientGetStatsHandler(event:Event):void
+			{
+				if (!__appWideSingleton.appInfoObj['showBWChart'])
+				{
+					event = null;
+					return;
+				}
+				
+				if (bwChart.currentState == 'server')
+				{
+					if (bwChart.bwChart_DP.length >= 60)
+						bwChart.bwChart_DP.removeItemAt(0);
+					
+					bwChart.bwChart_DP.addItem(__appWideSingleton.clientStatsInfoObj);
+				}
+				
+				bwChart.bwPing_L.text = __appWideSingleton.clientStatsInfoObj.ping_rtt;
+				
+				event = null;
+			}
+			
+			
+			private function applicationBar_appSettings_Btn_clickHandler(event:MouseEvent):void
+			{
+				debugMsg("applicationBar_appSettings_Btn_clickHandler->  CLICKED, OPENING ApplicationSettings_PopUpTitleWindow!");
+				
+				PopUpManager.createPopUp(parentApplication.lobby, ApplicationSettings_PopUpTitleWindow, true);
+				
+				event = null;
+			}
+			
+			
+			private function applicationBar_liveStreamSettings_Btn_clickHandler(event:MouseEvent):void
+			{
+				debugMsg("applicationBar_liveStreamSettings_Btn_clickHandler->  CLICKED, OPENING LiveStreamSettings_PopUpTitleWindow!");
+				
+				PopUpManager.createPopUp(parentApplication.lobby, LiveStreamSettings_PopUpTitleWindow, true);
+				
+				event = null;
+			}
+			
+			
+			private function applicationBar_blockList_Btn_clickHandler(event:MouseEvent):void
+			{
+				debugMsg("applicationBar_blockList_Btn_clickHandler->  CLICKED, OPENING BlockList_PopUpTitleWindow!");
+				
+				PopUpManager.createPopUp(parentApplication.lobby, BlockList_PopUpTitleWindow, true);
+				
+				event = null;
+			}
+			
+			
+			
+			
+			private function onAppClose(event:Event):void
+			{
+				debugMsg("onAppClose->  ");
+				
+				if (bwChart.currentState == 'server')
+				{
+					bwChart.bwChart_DP.removeAll();
+				}
+				
+				applicationBar_blockList_Btn.enabled = false;
+				bwChart.doBWCheck_Btn.enabled = false;
+				
+				__iconManager = null;
+				__appWideSingleton = null;
+				__appWideEventDispatcher = null;
+				
+				event = null;
+			}
+			
+			
+			
+			
+			
+			private function onAppConnected():void
+			{
+				applicationBar_blockList_Btn.enabled = true;
+				bwChart.doBWCheck_Btn.enabled = true;
+			}
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			private function debugMsg(str:String):void
+			{
+				AppWideDebug_Singleton.getInstance().newDebugMessage(this.id, str);
+			}
+			
+			
+			
+		]]>
+	</fx:Script>
+	
+	
+	
+	
+	
+	
+	
+	<!-- background rect in the back (on the bottom layer) 
+	<s:Rect width="100%" height="100%">
+		<s:fill>
+			<s:SolidColor color="0x393939" alpha="0.4"/>
+		</s:fill>
+	</s:Rect>
+	-->
+	
+	
+	
+	
+	<!-- main -->
+	<s:HGroup width="100%" maxHeight="30"
+			  horizontalAlign="center" 
+			  verticalAlign="middle">
+		
+		
+		<!-- left -->
+		<s:HGroup width="33%" height="100%"
+				  horizontalAlign="center"
+				  verticalAlign="middle">
+			
+			<s:Button id="applicationBar_appSettings_Btn" 
+					  width="100" height="90%"
+					  label="Settings" icon="{__iconManager.getIcon('app_settings')}"
+					  click="applicationBar_appSettings_Btn_clickHandler(event)"/>
+			<!--
+			<s:Button id="applicationBar_liveStreamSettings_Btn" 
+					  width="100" height="90%"
+					  label="Live Stream" icon="{__iconManager.getIcon('app_television')}"
+					  click="applicationBar_liveStreamSettings_Btn_clickHandler(event)"
+					  enabled="false"/>
+			-->
+			<s:Button id="applicationBar_blockList_Btn" 
+					  width="100" height="90%"
+					  label="Block List" 
+					  click="applicationBar_blockList_Btn_clickHandler(event)"
+					  enabled="false"/>
+			
+			<!--
+			<s:VGroup width="100%" height="100%" gap="0"
+					  horizontalAlign="center"
+					  verticalAlign="middle">
+				
+				<s:HGroup width="100%" height="100%"
+						  horizontalAlign="center"
+						  verticalAlign="middle">
+					
+					<s:Label id="appWidth_L" fontSize="10"/>
+					
+				</s:HGroup>
+				
+				<s:HGroup width="100%" height="100%"
+						  horizontalAlign="center"
+						  verticalAlign="middle">
+					
+					<s:Label id="appHeight_L" fontSize="10"/>
+					
+				</s:HGroup>
+				
+			</s:VGroup>
+			
+			<s:VGroup width="100%" height="100%" gap="0"
+					  horizontalAlign="center"
+					  verticalAlign="middle">
+				
+				<s:HGroup width="100%" height="100%"
+						  horizontalAlign="center"
+						  verticalAlign="middle">
+					
+					<s:Label id="screenWidth_L" fontSize="10"/>
+					
+				</s:HGroup>
+				
+				<s:HGroup width="100%" height="100%"
+						  horizontalAlign="center"
+						  verticalAlign="middle">
+					
+					<s:Label id="screenHeight_L" fontSize="10"/>
+					
+				</s:HGroup>
+				
+			</s:VGroup>
+			-->
+			
+		</s:HGroup>
+		
+		
+		
+		
+		<!-- center -->
+		<s:HGroup width="33%" height="100%" 
+				  horizontalAlign="center"
+				  verticalAlign="middle">
+			
+			<s:Label id="applicationBar_titleText_L" 
+					 textAlign="center" maxDisplayedLines="1"
+					 verticalAlign="middle"
+					 text="Hot Tub"
+					 fontSize="24"/>
+			
+		</s:HGroup>
+		
+		
+		
+		
+		<!-- right -->
+		<!-- compoonent is an HGroup already, comment the one below -->
+		<!--
+		<s:HGroup width="33%" height="30">
+		-->	
+			<components:BandwidthChart id="bwChart" 
+									   width="33%" maxWidth="385" height="100%" 
+									   horizontalAlign="center"
+									   verticalAlign="middle"/>
+		<!--	
+		</s:HGroup>
+		-->
+		
+		
+	</s:HGroup>
+	
+	
+	
+	
+	
+</s:Group>

@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+	xmlns:s="library://ns.adobe.com/flex/spark" 
+	xmlns:mx="library://ns.adobe.com/flex/mx" 
+	close="handleCloseEvent()" 
+	creationComplete="creationCompleteHandler(event)"
+	width="260" height="280"
+	title="Ban IP Range" backgroundColor="#249F18">
+	
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	
+	<s:layout>
+		<s:VerticalLayout/>
+	</s:layout>
+	
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			import mx.managers.PopUpManager;
+			
+			import events.CustomEvent;
+			
+			
+			private var cmdObj:Object = new Object();
+			private var bannedIP:Array = new Array();
+			private var ipArr:Array;
+			
+			
+			
+			// Handle the close button and Cancel button.
+			private function handleCloseEvent():void
+			{
+				if (parentApplication.loginPanel.nc.client.hasEventListener("getUserIP"))
+					parentApplication.loginPanel.nc.client.removeEventListener("getUserIP", getUserIP);
+				
+				cmdObj = null;
+				ipArr = null;
+				bannedIP = null;
+				
+				parentApplication.lobby.openPopUps_AC.removeItemAt(parentApplication.lobby.openPopUps_AC.getItemIndex(this));
+				
+				PopUpManager.removePopUp(this);
+			}
+			
+			
+			private function creationCompleteHandler(event:FlexEvent):void
+			{
+				parentApplication.lobby.openPopUps_AC.addItem(this);
+				
+				PopUpManager.centerPopUp(this);
+				
+				if (!parentApplication.loginPanel.nc.client.hasEventListener("getUserIP"))
+					parentApplication.loginPanel.nc.client.addEventListener("getUserIP", getUserIP, false,0,true);
+				
+				cmdObj.clientID = parentApplication.lobby.mediaManager.clientID;
+				cmdObj.acctID = parentApplication.lobby.mediaManager.acctID;
+				cmdObj.userID = parentApplication.lobby.mediaManager.userID;
+				cmdObj.userName = parentApplication.lobby.mediaManager.userName;
+				
+				cmdObj.selectedUserAcctID = parentApplication.lobby.userListPanel.userList_DG.selectedItem.acctID;
+				cmdObj.selectedUserID = parentApplication.lobby.userListPanel.userList_DG.selectedItem.userID;
+				cmdObj.selectedUserName = parentApplication.lobby.userListPanel.userList_DG.selectedItem.userName;
+				
+				cmdObj.cmd = "getip";
+				
+				parentApplication.loginPanel.nc.call("adminCmd", null, cmdObj);
+				
+				event = null;
+			}
+			
+			
+			private function cancelBtn_clickHandler(event:MouseEvent):void
+			{
+				handleCloseEvent();
+				
+				event = null;
+			}
+			
+			
+			private function banBtn_clickHandler(event:MouseEvent):void
+			{
+				if (customIP_RB.selected)
+				{
+					formatCustomBannedIP();
+				}
+				
+				cmdObj.cmd = "banip";
+				cmdObj.reason = banReason_TI.text;
+				
+				parentApplication.lobby.userListPanel.userCmdObj = cmdObj;
+				
+				PopUpManager.createPopUp(parentApplication.lobby, BanConfirmation_PopUpTitleWindow, true);
+				
+				event = null;
+				
+				handleCloseEvent();
+			}
+			
+			
+			private function getUserIP(event:CustomEvent):void
+			{
+				var ip:Array = event.eventObj.ip.toString().split(".");
+				ipA.text = ip[0].toString();
+				if (classB_RB.selected||classC_RB.selected||classD_RB.selected)
+				{
+					ipB.text = ip[1].toString();
+				} else {
+					ipB.text = "*";
+					ipB.enabled = false;
+				}
+				if (classC_RB.selected||classD_RB.selected)
+				{
+					ipC.text = ip[2].toString();
+				} else {
+					ipC.text = "*";
+					ipC.enabled = false;
+				}
+				if (classD_RB.selected)
+				{
+					ipD.text = ip[3].toString();
+				} else {
+					ipD.text = "*";
+					ipD.enabled = false;
+				}
+				if (parentApplication.loginPanel.nc.client.hasEventListener("getUserIP"))
+				{
+					parentApplication.loginPanel.nc.client.removeEventListener("getUserIP",getUserIP);
+				}
+				ipArr = ip;
+				formatIPclass();
+				bannedIP = [ipArr[0],ipArr[1],ipArr[2],ipArr[3]];
+				cmdObj.bannedIP = bannedIP;
+				ip = null;
+				event = null;
+			}
+			
+			
+			private function formatIPclass():void
+			{
+				classAformat.text = ipArr[0].toString()+".*.*.*";
+				classBformat.text = ipArr[0].toString()+"."+ipArr[1].toString()+".*.*";
+				classCformat.text = ipArr[0].toString()+"."+ipArr[1].toString()+"."+ipArr[2].toString()+".*";
+				classDformat.text = ipArr[0].toString()+"."+ipArr[1].toString()+"."+ipArr[2].toString()+"."+ipArr[3].toString();
+			}
+			
+			
+			private function formatIPInput(event:MouseEvent):void
+			{
+				trace("formatIPInput>  event.target: "+event.target+"  event.currentTarget: "+event.currentTarget);
+				switch (event.target.id)
+				{
+					case "classA_RB" :
+						ipA.text = ipArr[0].toString();
+						ipA.enabled = true;
+						ipB.text = "*";
+						ipB.enabled = false;
+						ipC.text = "*";
+						ipC.enabled = false;
+						ipD.text = "*";
+						ipD.enabled = false;
+						bannedIP = [ipArr[0]];
+						cmdObj.bannedIP = bannedIP;
+					break;
+					case "classB_RB" :
+						ipA.text = ipArr[0].toString();
+						ipA.enabled = true;
+						ipB.text = ipArr[1].toString();
+						ipB.enabled = true;
+						ipC.text = "*";
+						ipC.enabled = false;
+						ipD.text = "*";
+						ipD.enabled = false;
+						bannedIP = [ipArr[0],ipArr[1]];
+						cmdObj.bannedIP = bannedIP;
+					break;
+					case "classC_RB" :
+						ipA.text = ipArr[0].toString();
+						ipA.enabled = true;
+						ipB.text = ipArr[1].toString();
+						ipB.enabled = true;
+						ipC.text = ipArr[2].toString();
+						ipC.enabled = true;
+						ipD.text = "*";
+						ipD.enabled = false;
+						bannedIP = [ipArr[0],ipArr[1],ipArr[2]];
+						cmdObj.bannedIP = bannedIP;
+					break;
+					case "classD_RB" :
+						ipA.text = ipArr[0].toString();
+						ipA.enabled = true;
+						ipB.text = ipArr[1].toString();
+						ipB.enabled = true;
+						ipC.text = ipArr[2].toString();
+						ipC.enabled = true;
+						ipD.text = ipArr[3].toString();
+						ipD.enabled = true;
+						bannedIP = [ipArr[0],ipArr[1],ipArr[2],ipArr[3]];
+						cmdObj.bannedIP = bannedIP;
+					break;
+					case "customIP_RB" :
+						ipA.text = "0";
+						ipA.enabled = true;
+						ipB.text = "0";
+						ipB.enabled = true;
+						ipC.text = "0";
+						ipC.enabled = true;
+						ipD.text = "0";
+						ipD.enabled = true;
+						bannedIP = [ipA.text, ipB.text, ipC.text, ipD.text];
+						cmdObj.bannedIP = bannedIP;
+					break;
+				}
+				trace("formatIPInput>  bannedIP.length: "+bannedIP.length);
+				event = null;
+			}
+			
+			
+			private function formatCustomBannedIP():void
+			{
+				// if x.x.x.0
+				if ((ipA.text!="0") && (ipD.text=="0"))
+				{
+					bannedIP = [ipA.text,ipB.text,ipC.text];
+					cmdObj.bannedIP = bannedIP;
+				// if x.x.0.0
+				} else if ((ipA.text!="0") && (ipC.text=="0" && ipD.text=="0"))
+				{
+					bannedIP = [ipA.text,ipB.text];
+					cmdObj.bannedIP = bannedIP;
+				// if x.0.0.0
+				} else if ((ipA.text!="0") && (ipB.text=="0" && ipC.text=="0" && ipD.text=="0"))
+				{
+					bannedIP = [ipA.text];
+					cmdObj.bannedIP = bannedIP;
+				// if x.x.x.x
+				} else if (ipA.text!="0")
+				{
+					bannedIP = [ipA.text,ipB.text,ipC.text,ipD.text];
+					cmdObj.bannedIP = bannedIP;
+				}
+			}
+			
+		]]>
+	</fx:Script>
+	
+	
+	
+	
+	
+	<s:VGroup verticalAlign="middle" 
+			  horizontalAlign="center"
+			  width="260" height="250">
+		
+		<s:Label width="200"
+				 fontSize="16"
+				 text="IP Range:"/>
+		
+		<s:HGroup horizontalAlign="center"
+				  width="260">
+			<s:RadioButton id="classA_RB"
+						   click="formatIPInput(event)"/>
+			<mx:Text id="classAformat"/>
+			<s:RadioButton id="classB_RB"
+						   click="formatIPInput(event)"/>
+			<mx:Text id="classBformat"/>
+		</s:HGroup>
+		<s:HGroup horizontalAlign="center"
+				  width="260">
+			<s:RadioButton id="classC_RB"
+						   click="formatIPInput(event)"/>
+			<mx:Text id="classCformat"/>
+			<s:RadioButton id="classD_RB"
+						   click="formatIPInput(event)"
+						   selected="true"/>
+			<mx:Text id="classDformat"/>
+		</s:HGroup>
+		
+		<s:HGroup horizontalAlign="center"
+				  width="260">
+			<s:RadioButton id="customIP_RB"
+						   click="formatIPInput(event)"/>
+			<mx:Text id="format"
+					 text="Custom IP"/>
+		</s:HGroup>
+		
+		<s:HGroup width="260" gap="0"
+				  horizontalCenter="0" 
+				  horizontalAlign="center">
+			
+			<s:TextInput id="ipA" 
+						 width="40" 
+						 maxChars="3"
+						 restrict="1234567890"/>
+			<mx:Text text="."/>
+			<s:TextInput id="ipB" 
+						 width="40" 
+						 maxChars="3"
+						 restrict="1234567890"/>
+			<mx:Text text="."/>
+			<s:TextInput id="ipC" 
+						 width="40" 
+						 maxChars="3"
+						 restrict="1234567890"/>
+			<mx:Text text="."/>
+			<s:TextInput id="ipD" 
+						 width="40" 
+						 maxChars="3"
+						 restrict="1234567890"/>
+			
+		</s:HGroup>
+		
+		<s:Label text="Reason:"
+				 fontSize="16"/>
+		
+		<s:TextInput id="banReason_TI" 
+					 width="220" height="50"/>
+		
+		<s:HGroup>
+			
+			<s:Button id="banBtn" 
+					  label="Ban"
+					  click="banBtn_clickHandler(event)"/>
+			<s:Button id="cancelBtn"
+					  label="Cancel"
+					  click="cancelBtn_clickHandler(event)"/>
+			
+		</s:HGroup>
+		
+	</s:VGroup>
+	
+	
+</s:TitleWindow>
