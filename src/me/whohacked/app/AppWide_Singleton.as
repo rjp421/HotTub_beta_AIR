@@ -132,7 +132,7 @@ package me.whohacked.app
 			appInfoObj = {};
 			appInfoObj.login = "";
 			appInfoObj.pass = "";
-			appInfoObj.defaultQuality = "high";
+			appInfoObj.defaultQuality = "hd";
 			appInfoObj.version = this.version;
 			appInfoObj.debugMode = this.debugMode;
 			appInfoObj.chatDebugMode = false;
@@ -294,34 +294,47 @@ package me.whohacked.app
 				// window has been closed, and expects the user to have chosen
 				// their chosen devices. 
 				// Currently it only gets the current settings.
-				tmpArr = new ArrayList(Camera.names);
 				
-				var selectedCameraName:String = appInfoObj.selectedCameraName;
-				var selectedCamIndex:int = Camera.names.indexOf(selectedCameraName);
+				var _selectedCameraName:String = appInfoObj.selectedCameraName; // use the currently selected camera name
+				var _selectedCamIndex:int = Camera.names.indexOf(_selectedCameraName);
 				
-				debugMsg("setAppInfo->  <localCamera>  "+localCamera+"  selectedCameraName: "+selectedCameraName);
+				debugMsg("setAppInfo->  <localCamera>  "+this.localCamera+"  selectedCameraName: "+_selectedCameraName);
 				
+				this.localCamera = Camera.getCamera(_selectedCamIndex as String);
+
+				debugMsg("setAppInfo->  <localCamera>  "+this.localCamera+"  selectedCamIndex: "+_selectedCamIndex+"  selectedCameraName: "+_selectedCameraName);
+				
+				// TODO bad
 				// does not set the Camera.getCamera to the previously chosen devices yet.
 				// for now just selected them manually.
-				
 				/*
+				// check which camera matches the name? still bad
+				tmpArr = new ArrayList(Camera.names);
+				
 				for (var i:int = 0; i < tmpArr.length; ++i) 
 				{
-					var cameraName:String = selectedCameraName ? tmpArr.getItemAt(i) as String;
+					var cameraName:String = _selectedCameraName ? tmpArr.getItemAt(i) as String : '';
 					
 					if ((tmpArr.length) &&
 						(cameraName == val) &&
-						(Camera.getCamera(selectedCamIndex))
+						(Camera.getCamera(_selectedCamIndex as String)))
 					{
-						localCamera = Camera.getCamera(selectedCameraName ? i as String : '');
+						//localCamera = Camera.getCamera(selectedCameraName ? i as String : '');
+						this.localCamera = Camera.getCamera(_selectedCamIndex as String);
 						
-						debugMsg("setAppInfo->  <localCamera>  "+localCamera+"  cameraName: "+cameraName);
+						debugMsg("setAppInfo->  <localCamera>  "+this.localCamera+"  cameraName: "+cameraName+"  selectedCameraName: "+_selectedCameraName);
+
+						break; // exit if camera found
+					} else { 
+						// if not publishing
+						//__instance.localCamera = null;
 					}
 					
 					cameraName = null;
 				}
-				tmpArr = null;
 				*/
+				_selectedCameraName = null;
+				//_selectedCamIndex = null;
 			} else if (arg == 'selectedMicrophoneName') {
 				var selectedMicrophoneName:String = appInfoObj.selectedMicrophoneName;
 				var selectedMicIndex:int = Microphone.names.indexOf(selectedMicrophoneName);
