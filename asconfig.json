@@ -11,7 +11,7 @@
 	//	"output": "bin/HotTub_beta_AIR.air",
 	//	"signingOptions": {
 	//		"storetype": "pkcs12",
-	//		"keystore": "C:\\share\\dev\\AIR\\AIR_cert.p12"
+	//		"keystore": "D:\\share\\dev\\AIR\\AIR_cert.p12"
 	//	}
 	//},
 	"mainClass": "HotTub_beta_AIR",
