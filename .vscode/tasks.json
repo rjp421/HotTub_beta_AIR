@@ -5,7 +5,7 @@
 	"tasks": [
 		{
 			"type": "actionscript",
-			"debug": true,
+			"debug": false,
 			"group": {
 				"kind": "build",
 				"isDefault": true
