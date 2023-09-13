@@ -32,9 +32,9 @@ package me.whohacked.app
 		private var __appWideEventDispatcher:AppWideEventDispatcher_Singleton;
 		
 		
-		// version 4, date 04-16-2019, build 04
-		public var version:Number = 40416201904;
-		public var debugMode:Boolean = true;
+		// version 4, date 09-13-2023, build 01
+		public var version:Number = 40913202301;
+		public var debugMode:Boolean = false;
 		
 		public var flashVars:Object;
 		public var statsTimer:Timer;
@@ -298,9 +298,7 @@ package me.whohacked.app
 				var _selectedCameraName:String = appInfoObj.selectedCameraName; // use the currently selected camera name
 				var _selectedCamIndex:int = Camera.names.indexOf(_selectedCameraName);
 				
-				debugMsg("setAppInfo->  <localCamera>  "+this.localCamera+"  selectedCameraName: "+_selectedCameraName);
-				
-				this.localCamera = Camera.getCamera(_selectedCamIndex as String);
+				this.localCamera = Camera.getCamera(String(_selectedCamIndex));
 
 				debugMsg("setAppInfo->  <localCamera>  "+this.localCamera+"  selectedCamIndex: "+_selectedCamIndex+"  selectedCameraName: "+_selectedCameraName);
 				
@@ -394,6 +392,20 @@ package me.whohacked.app
 				__instance = new AppWide_Singleton();
 			}
 			
+			if (!__instance.localCamera)
+			{
+				if (__instance.appInfoObj.selectedCameraName.length)
+				{
+					var _selectedCameraName:String = __instance.appInfoObj.selectedCameraName; // use the currently selected camera name
+					var _selectedCamIndex:int = Camera.names.indexOf(_selectedCameraName);
+					
+					__instance.localCamera = Camera.getCamera(String(_selectedCamIndex));
+					_selectedCameraName = null;
+				} else {
+					__instance.localCamera = Camera.getCamera();
+				}
+			}
+
 			return __instance.localCamera;
 		}
 		
@@ -404,7 +416,7 @@ package me.whohacked.app
 			{
 				__instance = new AppWide_Singleton();
 			}
-			
+
 			return __instance.localMic;
 		}
 		
@@ -449,6 +461,11 @@ package me.whohacked.app
 			return x;
 		}
 		
+		// TODO
+		private function setCamera():void
+		{
+		}
+
 		
 		private function onOpenFlashSettingsHandler(event:CustomEvent):void
 		{

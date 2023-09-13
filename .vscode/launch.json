@@ -8,7 +8,7 @@
         "profile": "desktop",
         "program": "${workspaceFolder}/bin/HotTub_beta_AIR-app.xml",
         "args": [],
-        "runtimeExecutable": "C:\\share\\dev\\AIR\\AIRSDK\\bin\\adl64.exe",
+        "runtimeExecutable": "C:\\share\\dev\\AIR\\AIRSDK\\AIRSDK_50.2.3\\bin\\adl64.exe",
         "preLaunchTask": "Adobe AIR: package desktop debug (shared runtime) - asconfig.json"
       }
     ]

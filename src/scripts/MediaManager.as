@@ -263,11 +263,7 @@ package scripts
 			// if it is you sarting the video
 			if (_userID == userID)
 			{
-				// TODO: use getLocalCamera/Mic
-				//camera = (AppWide_Singleton.getInstance().localCamera ? AppWide_Singleton.getInstance().localCamera : Camera.getCamera())/*AppWide_Singleton.getLocalCamera()*/;
-				//camera = AppWide_Singleton.getLocalCamera();
-				//camera = AppWide_Singleton.getInstance().appInfoObj.selectedCameraName.length ? Camera.getCamera(Camera.names.indexOf(AppWide_Singleton.getInstance().appInfoObj.selectedCameraName) as String) : Camera.getCamera(Camera.names.indexOf("OBS Virtual Camera") as String);
-				camera = AppWide_Singleton.getInstance().localCamera = Camera.getCamera(Camera.names.indexOf("OBS Virtual Camera") as String); //TEST
+				camera = AppWide_Singleton.getLocalCamera();
 
 				debugMsg("startVideo->  camera: "+camera.name+"  localCamera: "+AppWide_Singleton.getInstance().localCamera.name+"  selectedCameraName: "+AppWide_Singleton.getInstance().appInfoObj.selectedCameraName);
 				

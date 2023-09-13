@@ -265,7 +265,7 @@
 			}
 			
 			
-			// TODO port to AIR functionality
+			// TODO port to AIR functionality or deprecate
 			private function openFlashSettingsBtn_clickHandler(event:MouseEvent):void
 			{
 				var device:String = event.target.id.split('choose')[1].split('_')[0];
@@ -510,7 +510,7 @@
 			<s:Label text="Devices"/>
 			
 			<s:VGroup id="deviceSettings_video_VG"
-					  width="100%" height="100%"
+					  width="100%"
 					  horizontalAlign="center" 
 					  verticalAlign="middle">
 				
@@ -524,12 +524,12 @@
 							 text="Video:"
 							 textAlign="center"
 							 opaqueBackground="0x009900"/>
-					
+					<!--
 					<s:Button id="chooseCamera_Btn"
 							  width="200" height="30"
 							  label="Choose Camera"
 							  click="openFlashSettingsBtn_clickHandler(event)"/>
-					
+					-->
 					<s:DropDownList id="selectedCamera_DDL"
 									width="100%" enabled="true"
 									change="selectedCamera_DDL_changeHandler(event)"
@@ -657,12 +657,12 @@
 						 text="Audio:"
 						 textAlign="center"
 						 opaqueBackground="0x009900"/>
-				
+				<!--
 				<s:Button id="chooseMicrophone_Btn"
 						  width="200" height="30"
 						  label="Choose Microphone"
 						  click="openFlashSettingsBtn_clickHandler(event)"/>
-				
+				-->
 				<s:DropDownList id="selectedMicrophone_DDL"
 								width="100%" enabled="true"
 								change="selectedMicrophone_DDL_changeHandler(event)"
@@ -684,8 +684,8 @@
 					   width="15" height="15" 
 					   source="{__iconManager.getIcon('app_info')}"/>
 		<s:Label color="#FFFF00"
-				 fontSize="7"
-				 text="TEMP: You may need to refresh the page for these changes to be fully applied!"/>
+				 fontSize="10"
+				 text="NOTE: You may need to restart your video/audio for these changes to be fully applied!"/>
 	</s:HGroup>
 	
 	
